@@ -17,42 +17,103 @@
     {
       "narration": "You spend hours every week writing emails. Here is how to do it in thirty seconds with AI.",
       "visual": "typing laptop",
-      "headline": "Emails in 30 seconds"
+      "headline": "Emails in 30 seconds",
+      "screen": {
+        "type": "title",
+        "tag": "AI for work",
+        "title": "Write any email in 30 seconds",
+        "subtitle": "The free 3-part prompt"
+      }
     },
     {
       "narration": "The problem is not the AI. It is the prompt. Most people type write an email, and get something generic.",
       "visual": "frustrated office",
-      "headline": "The real problem: your prompt"
+      "headline": "The real problem: your prompt",
+      "screen": {
+        "type": "chat",
+        "tag": "The usual mistake",
+        "title": "Vague prompt, generic result",
+        "user": "Write an email.",
+        "ai": "Dear Sir/Madam, I hope this email finds you well. I am writing to..."
+      }
     },
     {
       "narration": "Use a three part prompt instead. Part one, who you are writing to. Part two, what you need from them.",
       "visual": "business meeting",
-      "headline": "Part 1: Who it's for"
+      "headline": "Part 1: Who it's for",
+      "screen": {
+        "type": "steps",
+        "tag": "The 3-part prompt",
+        "title": "What to tell the AI",
+        "items": [
+          "Who you are writing to",
+          "What you need from them",
+          "Tone and length"
+        ]
+      }
     },
     {
       "narration": "Part three, the tone and length. For example, friendly but professional, under one hundred words.",
       "visual": "person writing",
-      "headline": "Part 2 & 3: Goal, tone, length"
+      "headline": "Part 2 & 3: Goal, tone, length",
+      "screen": {
+        "type": "bullets",
+        "tag": "Part 2 and 3",
+        "title": "Set the tone",
+        "items": [
+          "Friendly but professional",
+          "Under 100 words",
+          "Clear next step"
+        ]
+      }
     },
     {
       "narration": "Here is a full example. Write a short, polite email to a client asking for a payment that is a week late. Keep it friendly and firm.",
       "visual": "freelancer laptop",
-      "headline": "Example prompt"
+      "headline": "Example prompt",
+      "screen": {
+        "type": "chat",
+        "tag": "Full example",
+        "user": "Write a short, polite email to a client about a payment that is a week late. Keep it friendly and firm, under 100 words.",
+        "ai": "Hi Sarah, just a quick reminder that invoice #214 was due last week. Could you confirm when I can expect payment? Thanks so much!"
+      }
     },
     {
       "narration": "In seconds you get a clean draft. Now add one more line: give me two other versions, one shorter and one warmer.",
       "visual": "computer screen",
-      "headline": "Ask for 2 more versions"
+      "headline": "Ask for 2 more versions",
+      "screen": {
+        "type": "chat",
+        "tag": "Get options",
+        "user": "Give me two more versions: one shorter, one warmer.",
+        "ai": "Version A (short): Hi Sarah, a friendly nudge on invoice #214. Could you confirm the payment date? Thanks!"
+      }
     },
     {
       "narration": "Last step, and never skip it. Read it once, check names, dates and amounts, then send. AI drafts, you decide.",
       "visual": "checklist desk",
-      "headline": "Always check before sending"
+      "headline": "Always check before sending",
+      "screen": {
+        "type": "checklist",
+        "tag": "Never skip this",
+        "title": "Check before you send",
+        "items": [
+          "Names are correct",
+          "Dates and amounts match",
+          "It sounds like you"
+        ]
+      }
     },
     {
       "narration": "Try this on your next email, and subscribe for a new practical AI workflow every week.",
       "visual": "smartphone notification",
-      "headline": "Subscribe for weekly AI tips"
+      "headline": "Subscribe for weekly AI tips",
+      "screen": {
+        "type": "title",
+        "tag": "Next video",
+        "title": "Subscribe for weekly AI workflows",
+        "subtitle": "Practical tips, no hype"
+      }
     }
   ]
 }

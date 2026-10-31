@@ -5,7 +5,7 @@
   python main.py --from-script out/script.json        # re-render an edited script
 """
 import argparse, json, os, re
-import scriptgen, voice, visuals, render, upload
+import scriptgen, voice, visuals, render, upload, character, slides
 
 
 def slug(s):
@@ -51,8 +51,16 @@ def main():
     for i, sc in enumerate(script["scenes"]):
         audio = os.path.join(work, f"voice{i}.mp3")
         dur = voice.synth(sc["narration"], audio)
-        vpath, is_vid = visuals.get_visual(sc["visual"], work, i, sc.get("headline", ""))
-        scenes.append(dict(visual_path=vpath, is_video=is_vid, audio=audio, duration=dur, text=sc["narration"]))
+        entry = dict(audio=audio, duration=dur, text=sc["narration"])
+        if sc.get("screen"):  # relevant slide + animated presenter
+            png = os.path.join(work, f"slide{i}.png")
+            slides.render_slides([sc["screen"]], [png])
+            entry.update(visual_path=png, is_video=False, static=True,
+                         char_list=character.build_scene_frames(audio, dur + 0.25, work, i))
+        else:
+            vpath, is_vid = visuals.get_visual(sc["visual"], work, i, sc.get("headline", ""))
+            entry.update(visual_path=vpath, is_video=is_vid)
+        scenes.append(entry)
         print(f"scene {i + 1}/{len(script['scenes'])} ready ({dur:.1f}s)")
 
     video = render.render(scenes, work, os.path.join(out_dir, "final.mp4"), a.music)

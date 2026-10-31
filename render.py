@@ -17,8 +17,8 @@ PlayResX: {W}
 PlayResY: {H}
 
 [V4+ Styles]
-Format: Name,Fontname,Fontsize,PrimaryColour,OutlineColour,BackColour,Bold,Outline,Shadow,Alignment,MarginV
-Style: Default,DejaVu Sans,64,&H00FFFFFF,&H00000000,&H80000000,1,5,2,2,110
+Format: Name,Fontname,Fontsize,PrimaryColour,OutlineColour,BackColour,Bold,Outline,Shadow,Alignment,MarginL,MarginR,MarginV
+Style: Default,DejaVu Sans,64,&H00FFFFFF,&H00000000,&H80000000,1,5,2,2,90,640,60
 
 [Events]
 Format: Layer,Start,End,Style,Text
@@ -49,12 +49,22 @@ def render(scenes, workdir, out_path, music=None):
         if s["is_video"]:
             inp = ["-stream_loop", "-1", "-i", s["visual_path"]]
             filt = vf
+        elif s.get("static"):
+            inp = ["-loop", "1", "-framerate", str(FPS), "-i", s["visual_path"]]
+            filt = f"scale={W}:{H},fps={FPS},format=yuv420p"
         else:  # slow zoom on still image
             inp = ["-loop", "1", "-framerate", str(FPS), "-i", s["visual_path"]]
             filt = (f"scale=2400:-1,zoompan=z='min(zoom+0.0008,1.2)':d=1:s={W}x{H}:fps={FPS},format=yuv420p")
-        run(["ffmpeg", "-y", *inp, "-i", s["audio"], "-t", d, "-vf", filt,
-             "-af", "apad", "-shortest", "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
-             "-c:a", "aac", "-ar", "44100", "-ac", "2", seg])
+        if s.get("char_list"):
+            run(["ffmpeg", "-y", *inp, "-i", s["audio"], "-f", "concat", "-safe", "0", "-i", s["char_list"],
+                 "-t", d, "-filter_complex",
+                 f"[0:v]{filt}[bg];[2:v]format=rgba[c];[bg][c]overlay={W - 600}:{H - 700 - 10}:shortest=0,format=yuv420p[v]",
+                 "-map", "[v]", "-map", "1:a", "-af", "apad", "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
+                 "-c:a", "aac", "-ar", "44100", "-ac", "2", seg])
+        else:
+            run(["ffmpeg", "-y", *inp, "-i", s["audio"], "-t", d, "-vf", filt,
+                 "-af", "apad", "-shortest", "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
+                 "-c:a", "aac", "-ar", "44100", "-ac", "2", seg])
         segs.append(seg)
 
     lst = os.path.join(workdir, "list.txt")
