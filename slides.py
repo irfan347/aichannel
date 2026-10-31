@@ -167,3 +167,37 @@ while((t.scrollWidth>t.clientWidth||t.scrollHeight>520)&&f>50){{f-=4;t.style.fon
         b = p.chromium.launch(); pg = b.new_page(viewport={"width": 1280, "height": 720})
         pg.set_content(page); pg.screenshot(path=out); b.close()
     return out
+
+
+def thumbnail_vs(spec, char_png, out):
+    """'Before vs after' thumbnail (style A): grey manual side, green AI side, presenter, channel logo."""
+    import os
+    b64 = base64.b64encode(open(char_png, "rb").read()).decode()
+    lp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "brand", "logo.png")
+    logo = (f"<img class=logo src='data:image/png;base64,{base64.b64encode(open(lp, 'rb').read()).decode()}'>"
+            if os.path.exists(lp) else "")
+    e = lambda k: _e(spec[k])
+    page = f"""<html><head><style>*{{margin:0;box-sizing:border-box}}
+body{{width:1280px;height:720px;overflow:hidden;font-family:'DejaVu Sans',sans-serif;position:relative}}
+.s{{text-shadow:6px 6px 0 #000,-3px -3px 0 #000,3px -3px 0 #000,-3px 3px 0 #000}}
+.l{{position:absolute;left:0;top:0;width:640px;height:720px;background:#3f3f46}}
+.r{{position:absolute;left:640px;top:0;width:640px;height:720px;background:#16a34a}}
+.lab{{position:absolute;left:60px;top:40px;font-weight:900;font-size:62px;color:#fff}}
+.big{{position:absolute;left:60px;top:140px;white-space:nowrap;font-weight:900;font-size:140px;line-height:1;color:#fff}}
+.x{{position:absolute;left:60px;top:200px;width:520px;height:22px;background:#ef4444;transform:rotate(-12deg)}}
+.doc{{position:absolute;left:70px;top:390px;width:400px;height:260px;background:#fff;border-radius:22px;padding:30px}}
+.doc div{{height:22px;background:#d4d4d8;border-radius:11px;margin:16px 0}}
+.c{{position:absolute;right:-20px;bottom:-50px;height:400px}}
+.vs{{position:absolute;left:585px;top:300px;width:110px;height:110px;border-radius:50%;background:#facc15;font-weight:900;
+font-size:48px;display:flex;align-items:center;justify-content:center;border:6px solid #000}}
+.logo{{position:absolute;left:684px;bottom:40px;height:90px}}</style></head><body>
+<div class=l><div class="lab s">{e('left_label')}</div><div class="big s">{e('left')}</div><div class=x></div>
+<div class=doc><div style="width:60%"></div><div></div><div></div><div style="width:80%"></div></div></div>
+<div class=r><div class="lab s">{e('right_label')}</div><div class="big s" style="color:#facc15">{e('right')}</div></div>
+<img class=c src='data:image/png;base64,{b64}'><div class=vs>VS</div>{logo}
+<script>for(const b of document.querySelectorAll('.big')){{let f=140;while(b.scrollWidth>540&&f>60){{f-=6;b.style.fontSize=f+'px'}}}}</script>
+</body></html>"""
+    with sync_playwright() as p:
+        br = p.chromium.launch(); pg = br.new_page(viewport={"width": 1280, "height": 720})
+        pg.set_content(page); pg.screenshot(path=out); br.close()
+    return out

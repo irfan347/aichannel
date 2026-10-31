@@ -1,0 +1,27 @@
+{
+  "title": "Make a Job-Winning Resume With AI in 10 Minutes (Free Prompts)",
+  "short_title": "Make your resume with AI in 10 minutes",
+  "thumbnail": {"left_label": "BY HAND", "left": "3 HRS", "right_label": "WITH AI", "right": "10 MIN"},
+  "description": "Writing a resume takes hours. In this video you'll use three simple AI prompts to turn your messy experience into strong bullet points, tailor your resume to any job post, and catch the mistakes AI makes. Works with ChatGPT, Claude, Gemini or any free AI chatbot.\n\nSubscribe to Work Hacked for a new work shortcut every week.\n\nThis video uses AI-generated narration and visuals.\n\n#resume #AItools #jobsearch",
+  "tags": ["ai resume", "resume with ai", "chatgpt resume", "resume tips", "how to write a resume", "ai tools for job search", "resume prompts", "job search tips", "cv with ai", "work smarter", "productivity hacks", "career tips"],
+  "scenes": [
+    {"narration": "Most resumes get a few seconds of attention. Here is how to make yours stand out in ten minutes, using free AI.",
+     "screen": {"type": "title", "tag": "Work Hacked", "title": "A better resume in 10 minutes", "subtitle": "3 free AI prompts"}},
+    {"narration": "The mistake is asking AI to write a resume from nothing. You get something generic that sounds like everyone else.",
+     "screen": {"type": "chat", "tag": "The usual mistake", "title": "Vague prompt, generic resume", "user": "Write me a resume.", "ai": "Hardworking, motivated team player with excellent communication skills..."}},
+    {"narration": "Prompt one. Paste your old resume or just list what you did, messy is fine, and ask AI to turn it into strong bullet points.",
+     "screen": {"type": "chat", "tag": "Prompt 1", "user": "Here is what I did at my last job: [paste]. Turn it into 4 resume bullet points that start with action verbs and show results.", "ai": "Handled 40+ customer requests per day, keeping response times under 2 hours."}},
+    {"narration": "Good bullets start with an action verb and show a result. Numbers make them even stronger, but only use numbers that are true.",
+     "screen": {"type": "checklist", "title": "What a strong bullet has", "items": ["Starts with an action verb", "Shows a result", "Uses real numbers only"]}},
+    {"narration": "Prompt two. Paste the job post and ask AI to match your resume to it, using the same key skills the company asks for.",
+     "screen": {"type": "chat", "tag": "Prompt 2", "user": "Here is the job post: [paste]. Rewrite my bullets so they match the skills this job asks for. Do not invent anything.", "ai": "Matched: customer support, CRM tools, fast response times..."}},
+    {"narration": "This matters because many companies use software that scans resumes for those key words before a person ever reads it.",
+     "screen": {"type": "steps", "tag": "Why tailoring works", "title": "What happens to your resume", "items": ["Software scans for key words", "Best matches reach a person", "A person decides"]}},
+    {"narration": "Prompt three. Ask AI to act as a recruiter and point out what is weak or unclear. Then fix those parts.",
+     "screen": {"type": "chat", "tag": "Prompt 3", "user": "Act as a recruiter for this job. What are the 3 weakest parts of my resume?", "ai": "1. Your summary is too general. 2. No results in your second job. 3. Skills list is too long."}},
+    {"narration": "Last step, never skip it. Check every date, job title and number. AI can make things up, and a false claim can cost you the job.",
+     "screen": {"type": "checklist", "tag": "Never skip this", "title": "Check before you send", "items": ["Dates and job titles", "Every number is true", "It still sounds like you"]}},
+    {"narration": "Try these three prompts tonight, and subscribe to Work Hacked for a new work shortcut every week.",
+     "screen": {"type": "title", "tag": "Work Hacked", "title": "Subscribe for a new work shortcut every week", "subtitle": "Next: AI tools that save you an hour a day"}}
+  ]
+}

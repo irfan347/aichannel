@@ -53,8 +53,11 @@ def make_thumbnail(script, out_dir):
     work = os.path.join(out_dir, "work"); os.makedirs(work, exist_ok=True)
     face = os.path.join(work, "thumb_char.png")
     character.frame(True, 3, 1, 0).save(face)
+    out = os.path.join(out_dir, "thumbnail.png")
+    if script.get("thumbnail"):  # before-vs-after style
+        return slides.thumbnail_vs(script["thumbnail"], face, out)
     text = script.get("thumbnail_text") or " ".join(script["title"].split()[:4])
-    return slides.thumbnail(text, face, os.path.join(out_dir, "thumbnail.png"))
+    return slides.thumbnail(text, face, out)
 
 
 def main():
