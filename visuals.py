@@ -20,7 +20,7 @@ def pexels_video(query: str, out: str) -> bool:
             return False
         v = random.choice(vids)
         files = sorted([f for f in v["video_files"] if f["file_type"] == "video/mp4"],
-                       key=lambda f: abs(f["width"] - 1920))
+                       key=lambda f: abs((f.get("width") or 0) - 1920))
         data = requests.get(files[0]["link"], timeout=60).content
         open(out, "wb").write(data)
         return True

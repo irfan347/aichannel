@@ -19,10 +19,10 @@
       "visual": "typing laptop",
       "headline": "Emails in 30 seconds",
       "screen": {
-        "type": "title",
+        "type": "stock",
+        "query": "typing on laptop",
         "tag": "AI for work",
-        "title": "Write any email in 30 seconds",
-        "subtitle": "The free 3-part prompt"
+        "title": "Write any email in 30 seconds"
       }
     },
     {
@@ -115,5 +115,7 @@
         "subtitle": "Practical tips, no hype"
       }
     }
-  ]
+  ],
+  "thumbnail_text": "Emails in 30 seconds",
+  "short_title": "Write any email in 30 seconds with AI"
 }

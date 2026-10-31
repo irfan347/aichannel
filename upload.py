@@ -30,7 +30,7 @@ def _service():
     return build("youtube", "v3", credentials=creds)
 
 
-def upload(path, title, description, tags, privacy="private", publish_at=None):
+def upload(path, title, description, tags, privacy="private", publish_at=None, thumbnail=None):
     """privacy: private | unlisted | public. publish_at: RFC3339 UTC e.g. 2026-11-02T12:00:00Z (needs private)."""
     status = {"privacyStatus": privacy, "selfDeclaredMadeForKids": False,
               "containsSyntheticMedia": True}  # YouTube requires disclosing AI-generated content
@@ -39,9 +39,15 @@ def upload(path, title, description, tags, privacy="private", publish_at=None):
     body = {"snippet": {"title": title[:100], "description": description, "tags": tags,
                         "categoryId": "28"},  # Science & Technology
             "status": status}
-    req = _service().videos().insert(part="snippet,status", body=body,
+    yt = _service()
+    req = yt.videos().insert(part="snippet,status", body=body,
                                      media_body=MediaFileUpload(path, chunksize=-1, resumable=True))
     resp = None
     while resp is None:
         _, resp = req.next_chunk()
+    if thumbnail and os.path.exists(thumbnail):
+        try:  # custom thumbnails need a phone-verified channel
+            yt.thumbnails().set(videoId=resp["id"], media_body=MediaFileUpload(thumbnail)).execute()
+        except Exception as e:
+            print("Thumbnail not set (verify your channel at youtube.com/verify):", e)
     return f"https://youtu.be/{resp['id']}"

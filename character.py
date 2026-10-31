@@ -4,16 +4,33 @@ import array, os, random, subprocess
 from PIL import Image, ImageDraw
 
 FPS = 30
-CW, CH = 560, 700  # character canvas
+CW, CH = 680, 700  # character canvas
+OX = 60  # horizontal margin so gestures fit
 S = 2  # supersample
 
 
-def _base(eyes_open: bool, mouth: int) -> Image.Image:
+def _base(eyes_open: bool, mouth: int, pose: int = 0) -> Image.Image:
     im = Image.new("RGBA", (CW * S, CH * S), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    s = lambda *v: [x * S for x in v]
+    s = lambda *v: [(x + (OX if k % 2 == 0 else 0)) * S for k, x in enumerate(v)]
+
+    def limb(pts, w, col):
+        for a, b in zip(pts, pts[1:]):
+            d.line(s(*a, *b), fill=col, width=w * S)
+        for p in pts[:-1]:
+            d.ellipse(s(p[0] - w // 2, p[1] - w // 2, p[0] + w // 2, p[1] + w // 2), fill=col)
     # body / hoodie
     d.rounded_rectangle(s(60, 470, 500, 760), radius=120 * S, fill=(52, 99, 235))
+    sleeve, skin = (40, 85, 215), (235, 190, 150)
+    if pose == 1:   # arm raised, pointing at the slide on the left
+        limb([(130, 560), (40, 470), (-10, 360)], 64, sleeve)
+        d.ellipse(s(-48, 300, 28, 376), fill=skin)                       # fist
+        d.rounded_rectangle(s(-60, 318, 0, 346), radius=14 * S, fill=skin)  # index finger pointing left
+    elif pose == 2:  # open hand explaining
+        limb([(430, 600), (530, 560), (560, 470)], 64, sleeve)
+        d.ellipse(s(520, 390, 600, 470), fill=skin)
+        for fx in (528, 548, 568, 588):
+            d.rounded_rectangle(s(fx - 8, 360, fx + 8, 420), radius=8 * S, fill=skin)
     d.polygon(s(220, 470, 340, 470, 280, 560), fill=(235, 190, 150))   # neckline
     d.rectangle(s(240, 400, 320, 480), fill=(235, 190, 150))           # neck
     # head + ears
@@ -60,10 +77,15 @@ def _base(eyes_open: bool, mouth: int) -> Image.Image:
 _cache = {}
 
 
-def frame(eyes_open, mouth):
-    k = (eyes_open, mouth)
+BOB = 8  # px of head/body bob while talking
+
+
+def frame(eyes_open, mouth, pose=0, bob=0):
+    k = (eyes_open, mouth, pose, bob)
     if k not in _cache:
-        _cache[k] = _base(eyes_open, mouth)
+        im = Image.new("RGBA", (CW, CH), (0, 0, 0, 0))
+        im.alpha_composite(_base(eyes_open, mouth, pose), (0, BOB - bob))
+        _cache[k] = im
     return _cache[k]
 
 
@@ -83,14 +105,15 @@ def loudness(audio_path, fps=FPS):
     return [min(v / peak, 1.0) for v in vals]
 
 
-def build_scene_frames(audio_path, total_seconds, workdir, idx, seed=0):
+def build_scene_frames(audio_path, total_seconds, workdir, idx, seed=0, gesture_at_start=True):
     """writes PNGs for each distinct state + a concat list file; returns list path"""
     rnd = random.Random(seed + idx)
     loud = loudness(audio_path)
     n = int(total_seconds * FPS) + 1
     loud += [0.0] * (n - len(loud))
     states, blink_left, next_blink = [], 0, rnd.randint(60, 120)
-    prev = 0
+    prev, pose, pose_left, next_pose = 0, 0, 0, rnd.randint(45, 90)
+    first_point = gesture_at_start
     for i in range(n):
         if blink_left > 0:
             blink_left -= 1; eyes = False
@@ -100,12 +123,24 @@ def build_scene_frames(audio_path, total_seconds, workdir, idx, seed=0):
                 blink_left, next_blink = 4, rnd.randint(60, 140)
         l = loud[i]
         m = 0 if l < 0.12 else 1 if l < 0.4 else 2 if l < 0.7 else 3
-        m = round(0.5 * m + 0.5 * prev) if m != prev else m  # smooth
+        m = round(0.5 * m + 0.5 * prev) if m != prev else m
         prev = m
-        states.append((eyes, m))
+        # gestures: point at the slide when it changes, otherwise occasional explaining hand
+        if first_point and i > 8 and l > 0.2:
+            pose, pose_left, first_point = 1, 45, False
+        if pose_left > 0:
+            pose_left -= 1
+            if pose_left == 0:
+                pose = 0
+        else:
+            next_pose -= 1
+            if next_pose <= 0 and l > 0.25:
+                pose, pose_left, next_pose = rnd.choice([2, 2, 1]), rnd.randint(30, 50), rnd.randint(70, 140)
+        bob = round(min(l, 1.0) * 2) * (BOB // 2)
+        states.append((eyes, m, pose, bob))
     paths = {}
     for st in set(states):
-        p = os.path.join(workdir, f"char_{int(st[0])}{st[1]}.png")
+        p = os.path.join(workdir, "char_%d%d%d%d.png" % (int(st[0]), st[1], st[2], st[3]))
         if not os.path.exists(p):
             frame(*st).save(p)
         paths[st] = os.path.abspath(p)

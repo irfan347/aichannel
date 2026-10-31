@@ -5,6 +5,9 @@ on:
       script:
         description: "Script file in scripts/"
         default: "scripts/video01.json"
+      format:
+        description: "both / landscape / vertical"
+        default: "both"
       upload:
         description: "Upload to YouTube?"
         type: boolean
@@ -20,11 +23,19 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
-      - run: pip install edge-tts anthropic google-api-python-client google-auth-oauthlib pillow requests playwright && python -m playwright install --with-deps chromium
-      - name: Render
+      - run: pip install edge-tts google-api-python-client google-auth-oauthlib pillow requests playwright && python -m playwright install --with-deps chromium
+      - name: Render video, Short and thumbnail
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-        run: python main.py --from-script "${{ inputs.script }}"
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: python main.py --from-script "${{ inputs.script }}" --format "${{ inputs.format }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: video
+          path: |
+            scripts/*_out/final.mp4
+            scripts/*_out/short.mp4
+            scripts/*_out/thumbnail.png
       - name: Upload to YouTube
         if: ${{ inputs.upload }}
         env:
@@ -32,7 +43,3 @@ jobs:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
         run: python main.py --from-script "${{ inputs.script }}" --upload-only --privacy "${{ inputs.privacy }}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: video
-          path: scripts/*_out/final.mp4

@@ -1,74 +1,104 @@
 """Usage:
-  python main.py "How AI agents work"                 # script + voice + video
-  python main.py "How AI agents work" --upload        # ...and upload (private by default)
-  python main.py "Topic" --upload --privacy public --publish-at 2026-11-02T12:00:00Z
-  python main.py --from-script out/script.json        # re-render an edited script
+  python main.py --from-script scripts/video01.json                  # landscape video + Short + thumbnail
+  python main.py --from-script scripts/video01.json --format landscape
+  python main.py --from-script scripts/video01.json --upload --privacy public
+  python main.py "Topic" --review     # (needs ANTHROPIC_API_KEY) draft a script with Claude, then edit it
+
+Scene "screen" types: title, chat, steps, bullets, checklist, stock (stock footage, needs PEXELS_API_KEY).
 """
 import argparse, json, os, re
-import scriptgen, voice, visuals, render, upload, character, slides
+import voice, visuals, render, character, slides
 
 
 def slug(s):
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")[:40]
 
 
+def build(script, out_dir, music, vertical):
+    work = os.path.join(out_dir, "work")
+    os.makedirs(work, exist_ok=True)
+    scenes = []
+    with slides.Renderer(vertical) as R:
+        for i, sc in enumerate(script["scenes"]):
+            audio = os.path.join(work, f"voice{i}.mp3")
+            if not os.path.exists(audio):  # voice is shared by landscape + vertical
+                voice.synth(sc["narration"], audio)
+            dur = voice.duration(audio)
+            total = dur + 0.25
+            entry = dict(audio=audio, duration=dur, text=sc["narration"])
+            screen = sc.get("screen") or {"type": "title", "title": sc.get("headline", "")}
+            if screen.get("type") == "stock":
+                clip = os.path.join(work, f"stock{i}.mp4")
+                if os.path.exists(clip) or visuals.pexels_video(screen.get("query", sc.get("visual", "technology")), clip):
+                    entry.update(visual_path=clip, is_video=True)
+                else:  # no Pexels key / no result -> title slide instead
+                    screen = {"type": "title", "tag": screen.get("tag"), "title": screen.get("title", sc.get("headline", ""))}
+            if "visual_path" not in entry:
+                entry["slide_list"] = R.scene(screen, total, work, i)
+            if sc.get("presenter", True):
+                entry["char_list"] = character.build_scene_frames(
+                    audio, total, work, i, gesture_at_start=screen.get("type") in ("steps", "bullets", "checklist", "chat"))
+            scenes.append(entry)
+            print(f"[{'short' if vertical else 'video'}] scene {i + 1}/{len(script['scenes'])} ready ({dur:.1f}s)")
+    name = "short.mp4" if vertical else "final.mp4"
+    return render.render(scenes, work, os.path.join(out_dir, name), music, vertical)
+
+
+def make_thumbnail(script, out_dir):
+    work = os.path.join(out_dir, "work"); os.makedirs(work, exist_ok=True)
+    face = os.path.join(work, "thumb_char.png")
+    character.frame(True, 3, 1, 0).save(face)
+    text = script.get("thumbnail_text") or " ".join(script["title"].split()[:4])
+    return slides.thumbnail(text, face, os.path.join(out_dir, "thumbnail.png"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("topic", nargs="?")
     ap.add_argument("--from-script")
-    ap.add_argument("--scenes", type=int, default=8)
-    ap.add_argument("--seconds", type=int, default=60)
+    ap.add_argument("--format", default="both", choices=["both", "landscape", "vertical"])
     ap.add_argument("--music", default="music.mp3")
     ap.add_argument("--upload", action="store_true")
+    ap.add_argument("--upload-only", action="store_true")
     ap.add_argument("--privacy", default="private")
     ap.add_argument("--publish-at")
-    ap.add_argument("--upload-only", action="store_true")
-    ap.add_argument("--review", action="store_true", help="stop after script so you can edit it")
+    ap.add_argument("--review", action="store_true")
     a = ap.parse_args()
 
     if a.from_script:
         script = json.load(open(a.from_script))
         out_dir = os.path.splitext(a.from_script)[0] + "_out"
-        os.makedirs(out_dir, exist_ok=True)
     else:
-        script = scriptgen.generate_script(a.topic, a.scenes, a.seconds)
+        import scriptgen
+        script = scriptgen.generate_script(a.topic)
         out_dir = os.path.join("out", slug(script["title"]))
         os.makedirs(out_dir, exist_ok=True)
-        json.dump(script, open(os.path.join(out_dir, "script.json"), "w"), indent=2)
-        print("Script saved:", os.path.join(out_dir, "script.json"))
+        path = os.path.join(out_dir, "script.json")
+        json.dump(script, open(path, "w"), indent=2)
+        print("Script saved:", path)
         if a.review:
-            print("Edit it, then run: python main.py --from-script", os.path.join(out_dir, "script.json"))
             return
+    os.makedirs(out_dir, exist_ok=True)
 
-    if a.upload_only:
-        print("Uploaded:", upload.upload(os.path.join(out_dir, "final.mp4"), script["title"],
-              script["description"], script["tags"], a.privacy, a.publish_at))
-        return
+    if not a.upload_only:
+        print("Thumbnail:", make_thumbnail(script, out_dir))
+        if a.format in ("both", "landscape"):
+            print("Video:", build(script, out_dir, a.music, vertical=False))
+        if a.format in ("both", "vertical"):
+            print("Short:", build(script, out_dir, a.music, vertical=True))
 
-    work = os.path.join(out_dir, "work")
-    os.makedirs(work, exist_ok=True)
-    scenes = []
-    for i, sc in enumerate(script["scenes"]):
-        audio = os.path.join(work, f"voice{i}.mp3")
-        dur = voice.synth(sc["narration"], audio)
-        entry = dict(audio=audio, duration=dur, text=sc["narration"])
-        if sc.get("screen"):  # relevant slide + animated presenter
-            png = os.path.join(work, f"slide{i}.png")
-            slides.render_slides([sc["screen"]], [png])
-            entry.update(visual_path=png, is_video=False, static=True,
-                         char_list=character.build_scene_frames(audio, dur + 0.25, work, i))
-        else:
-            vpath, is_vid = visuals.get_visual(sc["visual"], work, i, sc.get("headline", ""))
-            entry.update(visual_path=vpath, is_video=is_vid)
-        scenes.append(entry)
-        print(f"scene {i + 1}/{len(script['scenes'])} ready ({dur:.1f}s)")
-
-    video = render.render(scenes, work, os.path.join(out_dir, "final.mp4"), a.music)
-    print("Video:", video)
-
-    if a.upload:
-        print("Uploaded:", upload.upload(video, script["title"], script["description"],
-                                         script["tags"], a.privacy, a.publish_at))
+    if a.upload or a.upload_only:
+        import upload
+        thumb = os.path.join(out_dir, "thumbnail.png")
+        main_vid = os.path.join(out_dir, "final.mp4")
+        if os.path.exists(main_vid):
+            print("Uploaded video:", upload.upload(main_vid, script["title"], script["description"],
+                                                   script["tags"], a.privacy, a.publish_at, thumbnail=thumb))
+        short = os.path.join(out_dir, "short.mp4")
+        if os.path.exists(short):
+            title = script.get("short_title", script["title"])[:90] + " #Shorts"
+            print("Uploaded short:", upload.upload(short, title, script["description"], script["tags"],
+                                                   a.privacy, a.publish_at))
 
 
 if __name__ == "__main__":
