@@ -51,7 +51,7 @@ def main():
     for i, sc in enumerate(script["scenes"]):
         audio = os.path.join(work, f"voice{i}.mp3")
         dur = voice.synth(sc["narration"], audio)
-        vpath, is_vid = visuals.get_visual(sc["visual"], work, i)
+        vpath, is_vid = visuals.get_visual(sc["visual"], work, i, sc.get("headline", ""))
         scenes.append(dict(visual_path=vpath, is_video=is_vid, audio=audio, duration=dur, text=sc["narration"]))
         print(f"scene {i + 1}/{len(script['scenes'])} ready ({dur:.1f}s)")
 

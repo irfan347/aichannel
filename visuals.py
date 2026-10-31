@@ -30,6 +30,7 @@ def pexels_video(query: str, out: str) -> bool:
 
 
 def gradient_card(text: str, out: str, idx: int):
+    text = text or ""
     a, b = PALETTES[idx % len(PALETTES)]
     img = Image.new("RGB", (W, H))
     px = ImageDraw.Draw(img)
@@ -40,15 +41,17 @@ def gradient_card(text: str, out: str, idx: int):
         font = ImageFont.truetype("DejaVuSans-Bold.ttf", 110)
     except OSError:
         font = ImageFont.load_default()
-    px.text((W // 2, H // 2 - 150), text.upper(), font=font, fill=(255, 255, 255, 40), anchor="mm")
+    import textwrap
+    for n, line in enumerate(textwrap.wrap(text, 22)[:3]):
+        px.text((W // 2, H // 2 - 200 + n * 130), line, font=font, fill=(255, 255, 255), anchor="mm")
     img.save(out)
 
 
-def get_visual(query: str, workdir: str, idx: int) -> tuple[str, bool]:
+def get_visual(query: str, workdir: str, idx: int, headline: str = "") -> tuple[str, bool]:
     """returns (path, is_video)"""
     v = os.path.join(workdir, f"bg{idx}.mp4")
     if pexels_video(query, v):
         return v, True
     p = os.path.join(workdir, f"bg{idx}.png")
-    gradient_card(query, p, idx)
+    gradient_card(headline, p, idx)
     return p, False
