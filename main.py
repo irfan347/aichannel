@@ -103,7 +103,9 @@ def main():
         if a.format in ("both", "landscape"):
             print("Video:", build(script, out_dir, a.music, False, audio))
         if a.format in ("both", "vertical"):
-            print("Short:", build(script, out_dir, a.music, True, audio))
+            idx = script.get("short_scenes") or list(range(len(script["scenes"])))
+            short = dict(script, scenes=[script["scenes"][i] for i in idx])
+            print("Short:", build(short, out_dir, a.music, True, [audio[i] for i in idx]))
 
     if a.upload or a.upload_only:
         import upload

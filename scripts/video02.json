@@ -1,27 +1,238 @@
 {
   "title": "Make a Job-Winning Resume With AI in 10 Minutes (Free Prompts)",
   "short_title": "Make your resume with AI in 10 minutes",
-  "thumbnail": {"left_label": "BY HAND", "left": "3 HRS", "right_label": "WITH AI", "right": "10 MIN"},
-  "description": "Writing a resume takes hours. In this video you'll use three simple AI prompts to turn your messy experience into strong bullet points, tailor your resume to any job post, and catch the mistakes AI makes. Works with ChatGPT, Claude, Gemini or any free AI chatbot.\n\nSubscribe to Work Hacked for a new work shortcut every week.\n\nThis video uses AI-generated narration and visuals.\n\n#resume #AItools #jobsearch",
-  "tags": ["ai resume", "resume with ai", "chatgpt resume", "resume tips", "how to write a resume", "ai tools for job search", "resume prompts", "job search tips", "cv with ai", "work smarter", "productivity hacks", "career tips"],
+  "thumbnail": {
+    "left_label": "BY HAND",
+    "left": "3 HRS",
+    "right_label": "WITH AI",
+    "right": "10 MIN"
+  },
+  "description": "Writing a resume takes hours. In this video you'll use three simple AI prompts to turn your messy experience into strong bullet points, tailor your resume to any job post, get a recruiter-style review, and catch the mistakes AI makes. Works with ChatGPT, Claude, Gemini or any free AI chatbot.\n\nSubscribe to Work Hacked for a new work shortcut every week.\n\nThis video uses AI-generated narration and visuals.\n\n#resume #AItools #jobsearch",
+  "tags": [
+    "ai resume",
+    "resume with ai",
+    "chatgpt resume",
+    "resume tips",
+    "how to write a resume",
+    "ai tools for job search",
+    "resume prompts",
+    "job search tips",
+    "cv with ai",
+    "work smarter",
+    "productivity hacks",
+    "career tips"
+  ],
   "scenes": [
-    {"narration": "Most resumes get a few seconds of attention. Here is how to make yours stand out in ten minutes, using free AI.",
-     "screen": {"type": "title", "tag": "Work Hacked", "title": "A better resume in 10 minutes", "subtitle": "3 free AI prompts"}},
-    {"narration": "The mistake is asking AI to write a resume from nothing. You get something generic that sounds like everyone else.",
-     "screen": {"type": "chat", "tag": "The usual mistake", "title": "Vague prompt, generic resume", "user": "Write me a resume.", "ai": "Hardworking, motivated team player with excellent communication skills..."}},
-    {"narration": "Prompt one. Paste your old resume or just list what you did, messy is fine, and ask AI to turn it into strong bullet points.",
-     "screen": {"type": "chat", "tag": "Prompt 1", "user": "Here is what I did at my last job: [paste]. Turn it into 4 resume bullet points that start with action verbs and show results.", "ai": "Handled 40+ customer requests per day, keeping response times under 2 hours."}},
-    {"narration": "Good bullets start with an action verb and show a result. Numbers make them even stronger, but only use numbers that are true.",
-     "screen": {"type": "checklist", "title": "What a strong bullet has", "items": ["Starts with an action verb", "Shows a result", "Uses real numbers only"]}},
-    {"narration": "Prompt two. Paste the job post and ask AI to match your resume to it, using the same key skills the company asks for.",
-     "screen": {"type": "chat", "tag": "Prompt 2", "user": "Here is the job post: [paste]. Rewrite my bullets so they match the skills this job asks for. Do not invent anything.", "ai": "Matched: customer support, CRM tools, fast response times..."}},
-    {"narration": "This matters because many companies use software that scans resumes for those key words before a person ever reads it.",
-     "screen": {"type": "steps", "tag": "Why tailoring works", "title": "What happens to your resume", "items": ["Software scans for key words", "Best matches reach a person", "A person decides"]}},
-    {"narration": "Prompt three. Ask AI to act as a recruiter and point out what is weak or unclear. Then fix those parts.",
-     "screen": {"type": "chat", "tag": "Prompt 3", "user": "Act as a recruiter for this job. What are the 3 weakest parts of my resume?", "ai": "1. Your summary is too general. 2. No results in your second job. 3. Skills list is too long."}},
-    {"narration": "Last step, never skip it. Check every date, job title and number. AI can make things up, and a false claim can cost you the job.",
-     "screen": {"type": "checklist", "tag": "Never skip this", "title": "Check before you send", "items": ["Dates and job titles", "Every number is true", "It still sounds like you"]}},
-    {"narration": "Try these three prompts tonight, and subscribe to Work Hacked for a new work shortcut every week.",
-     "screen": {"type": "title", "tag": "Work Hacked", "title": "Subscribe for a new work shortcut every week", "subtitle": "Next: AI tools that save you an hour a day"}}
+    {
+      "narration": "Most resumes get only a few seconds of attention. In the next few minutes, I'll show you how to build one that stands out, in about ten minutes, using free AI.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "A better resume in **10 minutes**",
+        "subtitle": "3 free AI prompts, step by step"
+      }
+    },
+    {
+      "narration": "You can do this with ChatGPT, Claude, Gemini, or any free AI chatbot. The prompts work the same way in all of them.",
+      "screen": {
+        "type": "bullets",
+        "tag": "What you need",
+        "title": "Any free AI chatbot",
+        "items": [
+          "ChatGPT",
+          "Claude",
+          "Gemini"
+        ]
+      }
+    },
+    {
+      "narration": "First, the mistake almost everyone makes. They open the chatbot and type, write me a resume.",
+      "screen": {
+        "type": "chat",
+        "tag": "The usual mistake",
+        "title": "Vague prompt, generic resume",
+        "user": "Write me a resume.",
+        "ai": "Hardworking, motivated team player with excellent communication skills..."
+      }
+    },
+    {
+      "narration": "The result sounds like every other resume. Recruiters see phrases like hardworking team player all day, and they skip right past them.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Why it fails",
+        "title": "Generic resumes get skipped",
+        "items": [
+          "Sounds like everyone else",
+          "No real results",
+          "Not matched to the job"
+        ]
+      }
+    },
+    {
+      "narration": "The fix is simple. Give the AI your real information, then guide it with three prompts. Let's go through them one by one.",
+      "screen": {
+        "type": "steps",
+        "tag": "The method",
+        "title": "Three prompts",
+        "items": [
+          "Turn experience into bullets",
+          "Match the job post",
+          "Get a recruiter review"
+        ]
+      }
+    },
+    {
+      "narration": "Prompt one. Paste your old resume, or just list what you did at each job. It can be messy. Then ask AI to turn it into strong bullet points.",
+      "screen": {
+        "type": "chat",
+        "tag": "Prompt 1",
+        "user": "Here is what I did at my last job: [paste]. Turn it into 4 resume bullet points that start with action verbs and show results.",
+        "ai": "Handled 40+ customer requests per day, keeping response times under 2 hours."
+      }
+    },
+    {
+      "narration": "Good bullet points follow a simple pattern. Start with an action verb, say what you did, and show the result.",
+      "screen": {
+        "type": "steps",
+        "tag": "The pattern",
+        "title": "A strong bullet point",
+        "items": [
+          "Action verb",
+          "What you did",
+          "The result"
+        ]
+      }
+    },
+    {
+      "narration": "Numbers make a bullet point much stronger. How many customers, how much time saved, how big the team was. But only use numbers that are true.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Make it stronger",
+        "title": "Add real numbers",
+        "items": [
+          "How many people or tasks",
+          "Time or money saved",
+          "Only numbers that are true"
+        ]
+      }
+    },
+    {
+      "narration": "Prompt two is where most people see the biggest difference. Find the job post you want, copy the whole description, and paste it in.",
+      "screen": {
+        "type": "chat",
+        "tag": "Prompt 2",
+        "user": "Here is the job post: [paste]. Rewrite my bullets so they match the skills this job asks for. Do not invent anything.",
+        "ai": "Matched skills: customer support, CRM tools, fast response times..."
+      }
+    },
+    {
+      "narration": "This matters because many companies use software that scans resumes for key words before a person ever reads them.",
+      "screen": {
+        "type": "steps",
+        "tag": "Why tailoring works",
+        "title": "What happens to your resume",
+        "items": [
+          "Software scans for key words",
+          "Best matches reach a person",
+          "A person decides"
+        ]
+      }
+    },
+    {
+      "narration": "So if the job post asks for project management, and your resume says organized team tasks, ask AI to use the job's own words where they are true for you.",
+      "screen": {
+        "type": "chat",
+        "tag": "Match the words",
+        "user": "Which skills from the job post are missing from my resume?",
+        "ai": "Missing: project management, Excel reporting. You mention organizing team tasks, which fits project management."
+      }
+    },
+    {
+      "narration": "Prompt three. Ask the AI to act like a recruiter for this exact job, and tell you the weakest parts of your resume.",
+      "screen": {
+        "type": "chat",
+        "tag": "Prompt 3",
+        "user": "Act as a recruiter for this job. What are the 3 weakest parts of my resume?",
+        "ai": "1. Your summary is too general. 2. No results in your second job. 3. Your skills list is too long."
+      }
+    },
+    {
+      "narration": "Fix those parts, then run the prompt again. Two or three rounds of this usually makes a big difference.",
+      "screen": {
+        "type": "steps",
+        "tag": "Repeat",
+        "title": "Improve in rounds",
+        "items": [
+          "Ask for feedback",
+          "Fix the weak parts",
+          "Ask again"
+        ]
+      }
+    },
+    {
+      "narration": "Bonus tip. Ask AI for a short summary at the top of your resume, two lines that say who you are and what you're great at.",
+      "screen": {
+        "type": "chat",
+        "tag": "Bonus",
+        "user": "Write a 2-line resume summary for this job, based only on my experience above.",
+        "ai": "Customer support specialist with 3 years of experience resolving issues quickly and keeping clients happy."
+      }
+    },
+    {
+      "narration": "Now the most important step. Never skip it. Check every date, job title and number. AI can make things up, and one false claim can cost you the job.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Never skip this",
+        "title": "Check before you send",
+        "items": [
+          "Dates and job titles",
+          "Every number is true",
+          "It still sounds like you"
+        ]
+      }
+    },
+    {
+      "narration": "Also keep the design simple. One column, clear headings, and a normal font. Fancy layouts can confuse the software that reads resumes.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Keep it simple",
+        "title": "Resume layout",
+        "items": [
+          "One column",
+          "Clear headings",
+          "Normal font"
+        ]
+      }
+    },
+    {
+      "narration": "So, three prompts. Turn your experience into strong bullets, match the job post, and get a recruiter review. Then check everything yourself.",
+      "screen": {
+        "type": "steps",
+        "tag": "Recap",
+        "title": "Your 10-minute resume",
+        "items": [
+          "Strong bullets",
+          "Matched to the job",
+          "Recruiter review"
+        ]
+      }
+    },
+    {
+      "narration": "Try this tonight with one job you really want, and subscribe to Work Hacked for a new work shortcut every week.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Subscribe for a new **work shortcut** every week",
+        "subtitle": "Next: AI tools that save you an hour a day"
+      }
+    }
+  ],
+  "short_scenes": [
+    0,
+    5,
+    8,
+    11,
+    14,
+    17
   ]
 }
