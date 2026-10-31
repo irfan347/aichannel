@@ -17,6 +17,11 @@ def slug(s):
 def build(script, out_dir, music, vertical):
     work = os.path.join(out_dir, "work")
     os.makedirs(work, exist_ok=True)
+    # make all voice files first, before the browser starts
+    for i, sc in enumerate(script["scenes"]):
+        audio = os.path.join(work, f"voice{i}.mp3")
+        if not os.path.exists(audio):
+            voice.synth(sc["narration"], audio)
     scenes = []
     with slides.Renderer(vertical) as R:
         for i, sc in enumerate(script["scenes"]):

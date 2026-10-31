@@ -33,7 +33,17 @@ def synth(text: str, path: str) -> float:
     last = None
     for v in EDGE_VOICES:
         try:
-            asyncio.run(_edge(text, path, v))
+            # run in its own thread so it works even when another event loop (Playwright) is active
+            import threading
+            err = []
+            def job():
+                try:
+                    asyncio.run(_edge(text, path, v))
+                except Exception as ex:
+                    err.append(ex)
+            t = threading.Thread(target=job); t.start(); t.join()
+            if err:
+                raise err[0]
             if os.path.getsize(path) > 1000:
                 return duration(path)
         except Exception as e:
