@@ -1,0 +1,38 @@
+name: Make video
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "Script file in scripts/"
+        default: "scripts/video01.json"
+      upload:
+        description: "Upload to YouTube?"
+        type: boolean
+        default: false
+      privacy:
+        description: "private / unlisted / public"
+        default: "private"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - run: pip install edge-tts anthropic google-api-python-client google-auth-oauthlib pillow requests
+      - name: Render
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: python main.py --from-script "${{ inputs.script }}"
+      - name: Upload to YouTube
+        if: ${{ inputs.upload }}
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: python main.py --from-script "${{ inputs.script }}" --upload-only --privacy "${{ inputs.privacy }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: video
+          path: scripts/*_out/final.mp4
