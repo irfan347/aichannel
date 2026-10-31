@@ -1,6 +1,6 @@
 {
   "title": "Write Any Email in 30 Seconds With AI (Free Method)",
-  "description": "Stop staring at a blank email. In this video you'll learn a simple 3-part prompt that makes AI write clear, professional emails for work, clients and job applications, plus the one check you should never skip. Subscribe for a new practical AI workflow every week.\n\nThis video was made with AI-assisted tools and narration.",
+  "description": "Stop staring at a blank email. In this video you'll learn a simple 3-part prompt that makes AI write clear, professional emails for work, clients and job applications, plus the one check you should never skip. Subscribe to Work Hacked for a new work shortcut every week.\n\nThis video was made with AI-assisted tools and narration.",
   "tags": [
     "ai tools",
     "chatgpt",
@@ -105,13 +105,13 @@
       }
     },
     {
-      "narration": "Try this on your next email, and subscribe for a new practical AI workflow every week.",
+      "narration": "Try this on your next email, and subscribe to Work Hacked for a new work shortcut every week.",
       "visual": "smartphone notification",
       "headline": "Subscribe for weekly AI tips",
       "screen": {
         "type": "title",
-        "tag": "Next video",
-        "title": "Subscribe for weekly AI workflows",
+        "tag": "Work Hacked",
+        "title": "Subscribe for a new work shortcut every week",
         "subtitle": "Practical tips, no hype"
       }
     }

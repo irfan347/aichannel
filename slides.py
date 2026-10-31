@@ -143,6 +143,10 @@ class Renderer:
 def thumbnail(text, char_png, out, accent="#facc15"):
     """1280x720 click-worthy thumbnail: huge 2-5 word text + presenter."""
     b64 = base64.b64encode(open(char_png, "rb").read()).decode()
+    import os
+    lp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "brand", "logo.png")
+    logo = (f"<img src='data:image/png;base64,{base64.b64encode(open(lp, 'rb').read()).decode()}'>"
+            if os.path.exists(lp) else "")
     words = _e(text).split()
     hi = " ".join(words[-2:]); lo = " ".join(words[:-2])
     page = f"""<html><head><style>*{{margin:0;box-sizing:border-box}}
@@ -152,9 +156,10 @@ background:radial-gradient(circle at 75% 40%,#4f46e5 0%,#1e1b4b 55%,#0b0f24 100%
 text-transform:uppercase;text-shadow:0 8px 0 #000,0 0 30px rgba(0,0,0,.6)}}
 .t span{{color:{accent}}}
 .badge{{position:absolute;left:50px;bottom:50px;background:#ef4444;color:#fff;font-weight:900;font-size:44px;
-padding:12px 26px;border-radius:14px;transform:rotate(-3deg)}}
-img{{position:absolute;right:-60px;bottom:-30px;height:660px}}</style></head>
-<body><div class='t'>{lo} <span>{hi}</span></div><div class='badge'>AI TOOLS</div>
+padding:10px 26px 10px 12px;border-radius:14px;transform:rotate(-3deg);display:flex;align-items:center;gap:14px}}
+.badge img{{position:static;height:64px}}
+body>img{{position:absolute;right:-60px;bottom:-30px;height:660px}}</style></head>
+<body><div class='t'>{lo} <span>{hi}</span></div><div class='badge'>{logo}WORK HACKED</div>
 <img src='data:image/png;base64,{b64}'>
 <script>const t=document.querySelector('.t');let f=120;
 while((t.scrollWidth>t.clientWidth||t.scrollHeight>520)&&f>50){{f-=4;t.style.fontSize=f+'px'}}</script></body></html>"""
