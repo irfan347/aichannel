@@ -1,103 +1,127 @@
-"""Step 4: assemble scenes + narration + presenter + burned-in captions + music into an mp4 with ffmpeg.
-Works for landscape (1920x1080) and vertical Shorts (1080x1920)."""
-import os, subprocess
+"""Step 4: assemble scenes into the final video with frame-exact audio sync.
+Every scene lasts exactly N frames; its voice is padded to exactly N/FPS seconds, so picture and sound
+never drift. Captions are timed per word, with the spoken word highlighted."""
+import os, re, subprocess
 
 FPS = 30
-CHAR_W, CHAR_H = 680, 700
-
-
-def _ass_time(t):
-    h, rem = divmod(t, 3600); m, s = divmod(rem, 60)
-    return f"{int(h)}:{int(m):02d}:{s:05.2f}"
-
-
-def make_ass(scene_texts, durations, path, W, H, vertical):
-    """Captions: each scene's text split into short chunks timed by word count."""
-    if vertical:  # above the presenter, centred
-        style, wpc = f"DejaVu Sans,74,&H00FFFFFF,&H00000000,&H80000000,1,6,2,2,60,60,{CHAR_H + 40}", 3
-    else:         # bottom-left, clear of the presenter
-        style, wpc = "DejaVu Sans,64,&H00FFFFFF,&H00000000,&H80000000,1,5,2,2,90,720,60", 4
-    head = f"""[Script Info]
-ScriptType: v4.00+
-PlayResX: {W}
-PlayResY: {H}
-
-[V4+ Styles]
-Format: Name,Fontname,Fontsize,PrimaryColour,OutlineColour,BackColour,Bold,Outline,Shadow,Alignment,MarginL,MarginR,MarginV
-Style: Default,{style}
-Style: Hi,{style.replace('&H00FFFFFF', '&H0000E5FF', 1)}
-
-[Events]
-Format: Layer,Start,End,Style,Text
-"""
-    lines, t0 = [], 0.0
-    for text, d in zip(scene_texts, durations):
-        words = text.split()
-        chunks = [words[i:i + wpc] for i in range(0, len(words), wpc)]
-        speak = d - 0.25
-        total_chars = sum(len(" ".join(c)) for c in chunks) or 1
-        t = t0
-        for c in chunks:
-            dur = speak * len(" ".join(c)) / total_chars
-            lines.append(f"Dialogue: 0,{_ass_time(t)},{_ass_time(t + dur)},Default,{' '.join(c)}")
-            t += dur
-        t0 += d
-    open(path, "w").write(head + "\n".join(lines) + "\n")
+YELLOW = "&H0015CCFA&"   # #FACC15 in ASS BGR
+WHITE = "&H00FFFFFF&"
 
 
 def run(cmd):
     r = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     if r.returncode:
-        raise RuntimeError("ffmpeg failed:\n" + r.stderr.decode()[-2000:])
+        raise RuntimeError("ffmpeg failed:\n" + r.stderr.decode()[-2500:])
+
+
+def _t(x):
+    x = max(x, 0)
+    h, rem = divmod(x, 3600); m, s = divmod(rem, 60)
+    return f"{int(h)}:{int(m):02d}:{s:05.2f}"
+
+
+def make_ass(words, path, W, H, vertical):
+    """words: [[start, end, text]] absolute seconds"""
+    if vertical:
+        fs, ml, mr, mv, wpc = 78, 70, 70, 560, 3
+    else:
+        fs, ml, mr, mv, wpc = 64, 110, 470, 64, 4
+    head = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {W}
+PlayResY: {H}
+WrapStyle: 0
+
+[V4+ Styles]
+Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding
+Style: Default,Inter,{fs},&H00FFFFFF,&H000000FF,&H00000000,&H78000000,-1,0,0,0,100,100,0,0,1,5,2,2,{ml},{mr},{mv},1
+
+[Events]
+Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
+"""
+    groups, cur = [], []
+    for w in words:
+        if cur and (len(cur) >= wpc or w[0] - cur[-1][1] > 0.45):
+            groups.append(cur); cur = []
+        cur.append(w)
+        if re.search(r"[.!?,;:]$", w[2]):
+            groups.append(cur); cur = []
+    if cur:
+        groups.append(cur)
+    clean = lambda s: s.replace("{", "(").replace("}", ")")
+    ev = []
+    for gi, g in enumerate(groups):
+        nxt = groups[gi + 1][0][0] if gi + 1 < len(groups) else g[-1][1] + 0.6
+        for k, w in enumerate(g):
+            start = w[0]
+            end = g[k + 1][0] if k + 1 < len(g) else min(w[1] + 0.35, nxt)
+            if end <= start:
+                end = start + 0.08
+            txt = " ".join((f"{{\\c{YELLOW}}}{clean(x[2])}{{\\c{WHITE}}}" if j == k else clean(x[2]))
+                           for j, x in enumerate(g))
+            ev.append(f"Dialogue: 0,{_t(start)},{_t(end)},Default,,0,0,0,,{txt}")
+    open(path, "w").write(head + "\n".join(ev) + "\n")
 
 
 def render(scenes, workdir, out_path, music=None, vertical=False):
-    """scenes: list of dict(audio, duration, text, and one of:
-         slide_list (concat file of animated slide states) | visual_path + is_video,
-       optional char_list (presenter frames))"""
+    """scenes: list of dict(frames=N, wav, words(scene-relative), slide(concat list), clip(optional stock mp4),
+    char(optional concat list))"""
     W, H = (1080, 1920) if vertical else (1920, 1080)
     tag = "v" if vertical else "h"
-    cover = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},format=yuv420p"
-    cx, cy = ((W - CHAR_W) // 2, H - CHAR_H) if vertical else (W - CHAR_W - 20, H - CHAR_H)
-    segs = []
+    bub = 420 if vertical else 340
+    cx, cy = ((W - bub) // 2, H - bub - 90) if vertical else (W - bub - 60, H - bub - 50)
+    cover = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS}"
+    vsegs, asegs, all_words, t0 = [], [], [], 0.0
     for i, s in enumerate(scenes):
+        N = s["frames"]; T = N / FPS
         seg = os.path.join(workdir, f"seg{i}_{tag}.mp4")
-        d = f"{s['duration'] + 0.25:.2f}"
-        if s.get("slide_list"):
-            inp = ["-f", "concat", "-safe", "0", "-i", s["slide_list"]]
-            filt = f"scale={W}:{H},fps={FPS},format=yuv420p"
-        elif s.get("is_video"):  # stock footage, darkened so text/presenter pop
-            inp = ["-stream_loop", "-1", "-i", s["visual_path"]]
-            filt = cover + ",eq=brightness=-0.12:saturation=0.9"
-        else:  # still image with slow zoom
-            inp = ["-loop", "1", "-framerate", str(FPS), "-i", s["visual_path"]]
-            filt = f"scale={W * 5 // 4}:-1,zoompan=z='min(zoom+0.0008,1.2)':d=1:s={W}x{H}:fps={FPS},format=yuv420p"
-        enc = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-c:a", "aac", "-ar", "44100", "-ac", "2"]
-        if s.get("char_list"):
-            run(["ffmpeg", "-y", *inp, "-i", s["audio"], "-f", "concat", "-safe", "0", "-i", s["char_list"],
-                 "-t", d, "-filter_complex",
-                 f"[0:v]{filt}[bg];[2:v]format=rgba[c];[bg][c]overlay={cx}:{cy}:eof_action=repeat,format=yuv420p[v];"
-                 f"[1:a]apad[a]", "-map", "[v]", "-map", "[a]", *enc, seg])
+        ins, fc = [], []
+        if s.get("clip"):
+            ins += ["-stream_loop", "-1", "-i", s["clip"], "-f", "concat", "-safe", "0", "-i", s["slide"]]
+            fc += [f"[0:v]{cover},eq=brightness=-0.08:saturation=0.95,format=rgba[b0]",
+                   f"[1:v]fps={FPS},format=rgba[o]", "[b0][o]overlay=0:0[b]"]
         else:
-            run(["ffmpeg", "-y", *inp, "-i", s["audio"], "-t", d, "-filter_complex",
-                 f"[0:v]{filt}[v];[1:a]apad[a]", "-map", "[v]", "-map", "[a]", *enc, seg])
-        segs.append(seg)
+            ins += ["-f", "concat", "-safe", "0", "-i", s["slide"]]
+            fc += [f"[0:v]fps={FPS},scale={W}:{H}[b]"]
+        if s.get("char"):
+            k = 2 if s.get("clip") else 1
+            ins += ["-f", "concat", "-safe", "0", "-i", s["char"]]
+            fc += [f"[{k}:v]fps={FPS},format=rgba[c]", f"[b][c]overlay={cx}:{cy}:eof_action=repeat,format=yuv420p[v]"]
+        else:
+            fc += ["[b]format=yuv420p[v]"]
+        run(["ffmpeg", "-y", *ins, "-filter_complex", ";".join(fc), "-map", "[v]", "-frames:v", str(N), "-an",
+             "-r", str(FPS), "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", seg])
+        vsegs.append(seg)
+        aseg = os.path.join(workdir, f"aud{i}_{tag}.wav")
+        run(["ffmpeg", "-y", "-i", s["wav"], "-af", "apad", "-t", f"{T:.6f}", "-ar", "48000", "-ac", "1",
+             "-c:a", "pcm_s16le", aseg])
+        asegs.append(aseg)
+        all_words += [[w[0] + t0, w[1] + t0, w[2]] for w in s["words"]]
+        t0 += T
 
-    lst = os.path.join(workdir, f"list_{tag}.txt")
-    open(lst, "w").write("".join(f"file '{os.path.abspath(p)}'\n" for p in segs))
-    joined = os.path.join(workdir, f"joined_{tag}.mp4")
-    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", joined])
+    def concat(paths, out):
+        lst = out + ".txt"
+        open(lst, "w").write("".join(f"file '{os.path.abspath(p)}'\n" for p in paths))
+        run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", out])
+        return out
+    joined = concat(vsegs, os.path.join(workdir, f"joined_{tag}.mp4"))
+    voice = concat(asegs, os.path.join(workdir, f"voice_{tag}.wav"))
 
     ass = os.path.join(workdir, f"captions_{tag}.ass")
-    make_ass([s["text"] for s in scenes], [s["duration"] + 0.25 for s in scenes], ass, W, H, vertical)
-
-    cmd = ["ffmpeg", "-y", "-i", joined]
+    make_ass(all_words, ass, W, H, vertical)
+    total = t0
+    fc = (f"[0:v]ass={ass},fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.45:.3f}:d=0.45[v];"
+          f"[1:a]loudnorm=I=-14:TP=-1.5:LRA=9,aresample=48000[vo]")
+    cmd = ["ffmpeg", "-y", "-i", joined, "-i", voice]
     if music and os.path.exists(music):
-        cmd += ["-stream_loop", "-1", "-i", music, "-filter_complex",
-                f"[0:v]ass={ass}[v];[1:a]volume=0.07[m];[0:a][m]amix=inputs=2:duration=first:normalize=0[a]",
-                "-map", "[v]", "-map", "[a]"]
+        cmd += ["-stream_loop", "-1", "-i", music]
+        fc = fc.replace("aresample=48000[vo]", "aresample=48000,asplit=2[vo][vsc]")
+        fc += (";[2:a]aresample=48000,volume=0.10[m0];[m0][vsc]sidechaincompress=threshold=0.03:ratio=6:release=400[m];"
+               f"[vo][m]amix=inputs=2:duration=first:normalize=0,afade=t=out:st={total - 0.6:.3f}:d=0.6[a]")
     else:
-        cmd += ["-vf", f"ass={ass}"]
-    cmd += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "21", "-c:a", "aac", "-movflags", "+faststart", out_path]
+        fc += f";[vo]afade=t=out:st={total - 0.5:.3f}:d=0.5[a]"
+    cmd += ["-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{total:.6f}",
+            "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart", out_path]
     run(cmd)
     return out_path

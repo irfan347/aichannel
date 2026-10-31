@@ -149,3 +149,70 @@ def build_scene_frames(audio_path, total_seconds, workdir, idx, seed=0, gesture_
         for st in states:
             f.write(f"file '{paths[st]}'\nduration {1 / FPS:.5f}\n")
     return lst
+
+
+def bubble(eyes_open, mouth, bob=0, size=340):
+    """presenter inside a round 'facecam' bubble with an accent ring"""
+    k = ("bubble", eyes_open, mouth, bob, size)
+    if k in _cache:
+        return _cache[k]
+    SS = 3
+    big = size * SS
+    bg = Image.new("RGBA", (big, big), (0, 0, 0, 0))
+    g = ImageDraw.Draw(bg)
+    for y in range(big):  # indigo gradient inside the circle
+        t = y / big
+        g.line([(0, y), (big, y)], fill=(int(67 + (30 - 67) * t), int(56 + (27 - 56) * t), int(202 + (75 - 202) * t), 255))
+    ch = frame(eyes_open, mouth, 0, bob).crop((20, 0, 660, 700))
+    cw = int(big * 0.92)
+    ch = ch.resize((cw, int(cw * ch.height / ch.width)), Image.LANCZOS)
+    bg.alpha_composite(ch, ((big - cw) // 2, int(big * 0.12)))
+    mask = Image.new("L", (big, big), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, big - 1, big - 1), fill=255)
+    out = Image.new("RGBA", (big, big), (0, 0, 0, 0))
+    out.paste(bg, (0, 0), mask)
+    d = ImageDraw.Draw(out)
+    ring = int(big * 0.03)
+    d.ellipse((ring // 2, ring // 2, big - ring // 2, big - ring // 2), outline=(250, 204, 21, 255), width=ring)
+    out = out.resize((size, size), Image.LANCZOS)
+    _cache[k] = out
+    return out
+
+
+def build_bubble_frames(audio_path, total_seconds, workdir, idx, size=340, seed=0):
+    """lip-sync + blink + slight bob inside the facecam bubble; returns concat list path"""
+    rnd = random.Random(seed + idx)
+    loud = loudness(audio_path)
+    n = int(round(total_seconds * FPS))
+    loud += [0.0] * (n - len(loud))
+    states, blink_left, next_blink, prev = [], 0, rnd.randint(60, 120), 0
+    for i in range(n):
+        if blink_left > 0:
+            blink_left -= 1; eyes = False
+        else:
+            eyes = True; next_blink -= 1
+            if next_blink <= 0:
+                blink_left, next_blink = 4, rnd.randint(70, 150)
+        l = loud[i]
+        m = 0 if l < 0.12 else 1 if l < 0.4 else 2 if l < 0.7 else 3
+        m = round(0.5 * m + 0.5 * prev) if m != prev else m
+        prev = m
+        states.append((eyes, m, round(min(l, 1.0) * 2) * (BOB // 2)))
+    lst = os.path.join(workdir, f"bub{size}_{idx}.txt")
+    with open(lst, "w") as f:
+        run_st, run_n = states[0], 0
+        def flush(st, c):
+            p = os.path.abspath(os.path.join(workdir, "bub%d_%d%d%d.png" % (size, int(st[0]), st[1], st[2])))
+            if not os.path.exists(p):
+                bubble(st[0], st[1], st[2], size).save(p)
+            f.write(f"file '{p}'\nduration {c / FPS:.5f}\n")
+            return p
+        last = None
+        for st in states:
+            if st == run_st:
+                run_n += 1
+            else:
+                last = flush(run_st, run_n); run_st, run_n = st, 1
+        last = flush(run_st, run_n)
+        f.write(f"file '{last}'\n")
+    return lst
