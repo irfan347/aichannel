@@ -1,0 +1,246 @@
+{
+  "title": "Let AI Write Your Excel Formulas (Works in Google Sheets Too)",
+  "short_title": "Get any Excel formula in seconds with AI",
+  "thumbnail": {
+    "left_label": "BY HAND",
+    "left": "1 HOUR",
+    "right_label": "WITH AI",
+    "right": "10 SEC"
+  },
+  "description": "Stop searching for Excel formulas. In this video you'll learn how to describe what you want in plain English and let a free AI chatbot write the formula for you: SUMIFS totals, XLOOKUP lookups, late-invoice flags and cleaning messy data. Plus how to get any formula explained and fix errors fast. Works in Excel and Google Sheets.\n\nSubscribe to Work Hacked for a new work shortcut every week.\n\nThis video uses AI-generated narration and visuals.\n\n#excel #AItools #productivity",
+  "tags": [
+    "excel formulas",
+    "ai excel",
+    "chatgpt excel",
+    "excel tips",
+    "google sheets formulas",
+    "sumifs",
+    "xlookup",
+    "excel for beginners",
+    "ai tools for work",
+    "productivity hacks",
+    "spreadsheet tips",
+    "work smarter"
+  ],
+  "short_scenes": [
+    0,
+    3,
+    4,
+    5,
+    6,
+    14
+  ],
+  "scenes": [
+    {
+      "narration": "Excel formulas can take forever to figure out. Today I'll show you how to get any formula you need in seconds, just by describing it in plain English.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Any Excel formula in **seconds**",
+        "subtitle": "Just describe what you want"
+      }
+    },
+    {
+      "narration": "This works with ChatGPT, Claude, Gemini or any free AI chatbot, and the formulas work in both Excel and Google Sheets.",
+      "screen": {
+        "type": "bullets",
+        "tag": "What you need",
+        "title": "Free tools that work",
+        "items": [
+          "Any free AI chatbot",
+          "Excel or Google Sheets",
+          "Your spreadsheet"
+        ]
+      }
+    },
+    {
+      "narration": "Here's the secret. Don't just say, give me a formula. Tell the AI three things.",
+      "screen": {
+        "type": "steps",
+        "tag": "The secret",
+        "title": "Tell the AI three things",
+        "items": [
+          "Which columns hold your data",
+          "What you want to calculate",
+          "Where the answer goes"
+        ]
+      }
+    },
+    {
+      "narration": "Example one. You have sales in a table. Region is in column B, and the amount is in column C. You want the total for the East region only.",
+      "screen": {
+        "type": "chat",
+        "tag": "Example 1",
+        "user": "Region is in column B, sales amount in column C. Give me a formula for the total sales for the East region.",
+        "ai": "=SUMIFS(C:C, B:B, \"East\")"
+      }
+    },
+    {
+      "narration": "Paste it in, and the answer appears instantly. No more adding numbers by hand or filtering the table.",
+      "screen": {
+        "type": "formula",
+        "tag": "Result",
+        "formula": "=SUMIFS(C:C, B:B, \"East\")",
+        "cols": [
+          "A: Date",
+          "B: Region",
+          "C: Sales"
+        ],
+        "rows": [
+          [
+            "Mar 1",
+            "East",
+            "1,200"
+          ],
+          [
+            "Mar 1",
+            "West",
+            "950"
+          ],
+          [
+            "Mar 2",
+            "East",
+            "800"
+          ],
+          [
+            "",
+            "Total East:",
+            "?"
+          ]
+        ],
+        "result": "2,000"
+      }
+    },
+    {
+      "narration": "Example two. You have a product list, and you need to find a price by its product code. This is called a lookup, and it confuses a lot of people.",
+      "screen": {
+        "type": "chat",
+        "tag": "Example 2",
+        "user": "Product codes are in column A, prices in column D. Find the price for the code typed in F2. Show Not found if it's missing.",
+        "ai": "=XLOOKUP(F2, A:A, D:D, \"Not found\")"
+      }
+    },
+    {
+      "narration": "Type a code, and the price shows up. If the code doesn't exist, you see Not found instead of an ugly error.",
+      "screen": {
+        "type": "formula",
+        "tag": "Result",
+        "formula": "=XLOOKUP(F2, A:A, D:D, \"Not found\")",
+        "cols": [
+          "F: Code",
+          "G: Price"
+        ],
+        "rows": [
+          [
+            "P-104",
+            "?"
+          ]
+        ],
+        "result": "$49.00"
+      }
+    },
+    {
+      "narration": "Example three. You want to flag invoices that are more than thirty days old, so you know who to chase for payment.",
+      "screen": {
+        "type": "chat",
+        "tag": "Example 3",
+        "user": "Invoice dates are in column D. Show Late if the date is more than 30 days ago, otherwise OK.",
+        "ai": "=IF(TODAY()-D2>30, \"Late\", \"OK\")"
+      }
+    },
+    {
+      "narration": "Put it in the first row, drag it down, and every invoice is checked automatically, every single day.",
+      "screen": {
+        "type": "formula",
+        "tag": "Result",
+        "formula": "=IF(TODAY()-D2>30, \"Late\", \"OK\")",
+        "cols": [
+          "C: Client",
+          "D: Date",
+          "E: Status"
+        ],
+        "rows": [
+          [
+            "Northwind",
+            "Aug 3",
+            "?"
+          ]
+        ],
+        "result": "Late"
+      }
+    },
+    {
+      "narration": "Example four, cleaning messy data. Names with extra spaces, or all in capital letters? One short formula fixes them.",
+      "screen": {
+        "type": "formula",
+        "tag": "Example 4",
+        "title": "Clean messy names",
+        "formula": "=PROPER(TRIM(A2))",
+        "cols": [
+          "A: Messy",
+          "B: Clean"
+        ],
+        "rows": [
+          [
+            "  JOHN   smith ",
+            "?"
+          ]
+        ],
+        "result": "John Smith"
+      }
+    },
+    {
+      "narration": "Now a pro tip. If you don't understand a formula, someone else's or one the AI gave you, paste it in and ask the AI to explain it step by step.",
+      "screen": {
+        "type": "chat",
+        "tag": "Pro tip",
+        "user": "Explain this formula step by step in simple words: =SUMIFS(C:C, B:B, \"East\")",
+        "ai": "It adds up the numbers in column C, but only on rows where column B says East."
+      }
+    },
+    {
+      "narration": "And if a formula gives you an error, copy the error message and paste it back to the AI. It will usually tell you exactly what went wrong.",
+      "screen": {
+        "type": "chat",
+        "tag": "Fix errors",
+        "user": "My formula shows #N/A. What does that mean and how do I fix it?",
+        "ai": "#N/A means the value wasn't found. Check for extra spaces or a different spelling."
+      }
+    },
+    {
+      "narration": "One warning. Always test a new formula on a copy of your file, and check a few results by hand before you trust it.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Never skip this",
+        "title": "Before you trust a formula",
+        "items": [
+          "Test on a copy",
+          "Check a few results by hand",
+          "Make sure the ranges are right"
+        ]
+      }
+    },
+    {
+      "narration": "So, describe your columns, say what you want, and let AI write the formula. Then test it.",
+      "screen": {
+        "type": "steps",
+        "tag": "Recap",
+        "title": "Excel formulas with AI",
+        "items": [
+          "Describe your columns",
+          "Say what you want",
+          "Test before you trust"
+        ]
+      }
+    },
+    {
+      "narration": "Try it on your own spreadsheet today, and subscribe to Work Hacked for a new work shortcut every week.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Subscribe for a new **work shortcut** every week",
+        "subtitle": "Next: AI tools that save you an hour a day"
+      }
+    }
+  ]
+}

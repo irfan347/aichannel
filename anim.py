@@ -54,6 +54,17 @@ h2{font-size:64px;line-height:1.1;font-weight:800;letter-spacing:-1px;margin-bot
 .ic{min-width:66px;height:66px;border-radius:18px;background:#4f46e5;font-size:36px;font-weight:800;display:flex;
  align-items:center;justify-content:center}
 .ic.ok{background:#16a34a}
+.sheet{background:#fff;color:#111827;border-radius:22px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.55);font-size:32px}
+.fx{display:flex;align-items:center;gap:18px;padding:16px 22px;background:#f1f5f9;border-bottom:2px solid #cbd5e1;
+ font-family:'DejaVu Sans Mono',monospace;font-size:31px;min-height:76px}
+.fx b{font-family:'Inter',sans-serif;color:#16a34a;font-size:30px;font-style:italic}
+.fx .tw{flex:1}
+.fx .caret{background:#111827;height:32px}
+table{border-collapse:collapse;width:100%}
+td,th{border:1.5px solid #e2e8f0;padding:14px 20px;text-align:left;white-space:nowrap;color:#111827;font-size:34px}
+th{background:#f8fafc;color:#64748b;font-weight:700;font-size:28px}
+td.res{background:#dcfce7;font-weight:800;color:#166534}
+td.target{outline:4px solid #16a34a;outline-offset:-4px}
 """
 LAND = "body{width:1920px;height:1080px}.area{left:110px;top:110px;width:1290px;height:800px}"
 VERT = ("body{width:1080px;height:1920px}.area{left:70px;top:190px;width:940px;height:1060px}"
@@ -167,6 +178,25 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
                   "<div class='ic ok'>&#10003;</div>" if t == "checklist" else "<div class=ic>&#8226;</div>")
             rows += f"<div class=item data-t={t0:.2f} data-a=left data-act0={t0:.2f} data-act1={t1:.2f}>{ic}<div>{_e(it)}</div></div>"
         inner = f"{tag}<h2 data-t=0.1>{_e(sc['title'])}</h2><div class=list>{rows}</div>"
+    elif t == "formula":
+        f = sc["formula"]
+        f0 = 0.6; f1 = f0 + min(len(f) / 22, max(sp * 0.5, 1.2))
+        r0 = f1 + 0.4
+        cols = "".join(f"<th>{_e(c)}</th>" for c in sc["cols"])
+        rows = ""
+        for ri, row in enumerate(sc["rows"]):
+            cells = ""
+            for ci, v in enumerate(row):
+                if v == "?":
+                    cells += (f"<td class='res target'><span style='opacity:0' data-t={r0:.2f} data-a=pop>"
+                              f"{_e(sc['result'])}</span></td>")
+                else:
+                    cells += f"<td>{_e(v)}</td>"
+            rows += f"<tr>{cells}</tr>"
+        head = f"<h2 data-t=0.1>{_e(sc['title'])}</h2>" if sc.get("title") else ""
+        fx = (f"<div class=fx><b>fx</b><div class=tw data-type0={f0:.2f} data-type1={f1:.2f} data-full=\"{_plain(f)}\">"
+              f"<span class=ghost>{_plain(f)}</span><span class=txt><span class=tt></span><span class=caret></span></span></div></div>")
+        inner = f"{tag}{head}<div class=sheet data-t=0.15 data-a=pop>{fx}<table><tr>{cols}</tr>{rows}</table></div>"
     else:  # title (also used over stock footage)
         sub = ""
         if sc.get("subtitle"):
