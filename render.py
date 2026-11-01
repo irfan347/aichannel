@@ -2,6 +2,7 @@
 Every scene lasts exactly N frames; its voice is padded to exactly N/FPS seconds, so picture and sound
 never drift. Captions are timed per word, with the spoken word highlighted."""
 import os, re, subprocess
+import sfx
 
 FPS = 30
 YELLOW = "&H0015CCFA&"   # #FACC15 in ASS BGR
@@ -71,7 +72,7 @@ def render(scenes, workdir, out_path, music=None, vertical=False):
     bub = 420 if vertical else 340
     cx, cy = ((W - bub) // 2, H - bub - 90) if vertical else (W - bub - 60, H - bub - 50)
     cover = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS}"
-    vsegs, asegs, all_words, t0 = [], [], [], 0.0
+    vsegs, asegs, all_words, t0, events = [], [], [], 0.0, []
     for i, s in enumerate(scenes):
         N = s["frames"]; T = N / FPS
         seg = os.path.join(workdir, f"seg{i}_{tag}.mp4")
@@ -97,6 +98,9 @@ def render(scenes, workdir, out_path, music=None, vertical=False):
              "-c:a", "pcm_s16le", aseg])
         asegs.append(aseg)
         all_words += [[w[0] + t0, w[1] + t0, w[2]] for w in s["words"]]
+        if i > 0:
+            events.append((max(t0 - 0.2, 0), "whoosh"))
+        events += [(t0 + et, k) for et, k in s.get("events", []) if et < T]
         t0 += T
 
     def concat(paths, out):
@@ -110,18 +114,19 @@ def render(scenes, workdir, out_path, music=None, vertical=False):
     ass = os.path.join(workdir, f"captions_{tag}.ass")
     make_ass(all_words, ass, W, H, vertical)
     total = t0
+    fx_wav = sfx.render_track(events, total, os.path.join(workdir, f"sfx_{tag}.wav"))
+    if not (music and os.path.exists(music)):
+        music = sfx.make_music(os.path.join(workdir, "pad.wav"))
     fc = (f"[0:v]ass={ass},fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.45:.3f}:d=0.45[v];"
-          f"[1:a]loudnorm=I=-14:TP=-1.5:LRA=9,aresample=48000[vo]")
-    cmd = ["ffmpeg", "-y", "-i", joined, "-i", voice]
-    if music and os.path.exists(music):
-        cmd += ["-stream_loop", "-1", "-i", music]
-        fc = fc.replace("aresample=48000[vo]", "aresample=48000,asplit=2[vo][vsc]")
-        fc += (";[2:a]aresample=48000,volume=0.10[m0];[m0][vsc]sidechaincompress=threshold=0.03:ratio=6:release=400[m];"
-               f"[vo][m]amix=inputs=2:duration=first:normalize=0,afade=t=out:st={total - 0.6:.3f}:d=0.6[a]")
-    else:
-        fc += f";[vo]afade=t=out:st={total - 0.5:.3f}:d=0.5[a]"
-    cmd += ["-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{total:.6f}",
-            "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
-            "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart", out_path]
+          f"[1:a]loudnorm=I=-15:TP=-2:LRA=9,aresample=48000,asplit=2[vo][vsc];"
+          f"[2:a]aresample=48000,volume=0.55[sx];"
+          f"[3:a]aresample=48000,volume=0.16,afade=t=in:st=0:d=1.5[m0];"
+          f"[m0][vsc]sidechaincompress=threshold=0.03:ratio=5:attack=20:release=500[m];"
+          f"[vo][sx][m]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.95,"
+          f"afade=t=out:st={total - 0.8:.3f}:d=0.8[a]")
+    cmd = ["ffmpeg", "-y", "-i", joined, "-i", voice, "-i", fx_wav, "-stream_loop", "-1", "-i", music,
+           "-filter_complex", fc, "-map", "[v]", "-map", "[a]", "-t", f"{total:.6f}",
+           "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+           "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart", out_path]
     run(cmd)
     return out_path

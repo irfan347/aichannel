@@ -150,7 +150,7 @@ def _typing(cls, who, text, t0, t1, appear, caret=True, dots_until=None):
             if dots_until else "")
     c = "<span class=caret></span>" if caret else ""
     return (f"<div class={cls} data-t={appear:.2f}><div class=who>{who}</div>"
-            f"<div class=tw data-type0={t0:.2f} data-type1={t1:.2f} data-full=\"{_plain(text)}\">"
+            f"<div class=tw {'data-sfx=type ' if caret else ''}data-type0={t0:.2f} data-type1={t1:.2f} data-full=\"{_plain(text)}\">"
             f"<span class=ghost>{_plain(text)}</span><span class=txt><span class=tt></span>{c}</span>{dots}</div></div>")
 
 
@@ -188,13 +188,13 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
             cells = ""
             for ci, v in enumerate(row):
                 if v == "?":
-                    cells += (f"<td class='res target'><span style='opacity:0' data-t={r0:.2f} data-a=pop>"
+                    cells += (f"<td class='res target'><span style='opacity:0' data-sfx=ding data-t={r0:.2f} data-a=pop>"
                               f"{_e(sc['result'])}</span></td>")
                 else:
                     cells += f"<td>{_e(v)}</td>"
             rows += f"<tr>{cells}</tr>"
         head = f"<h2 data-t=0.1>{_e(sc['title'])}</h2>" if sc.get("title") else ""
-        fx = (f"<div class=fx><b>fx</b><div class=tw data-type0={f0:.2f} data-type1={f1:.2f} data-full=\"{_plain(f)}\">"
+        fx = (f"<div class=fx><b>fx</b><div class=tw data-sfx=type data-type0={f0:.2f} data-type1={f1:.2f} data-full=\"{_plain(f)}\">"
               f"<span class=ghost>{_plain(f)}</span><span class=txt><span class=tt></span><span class=caret></span></span></div></div>")
         inner = f"{tag}{head}<div class=sheet data-t=0.15 data-a=pop>{fx}<table><tr>{cols}</tr>{rows}</table></div>"
     else:  # title (also used over stock footage)

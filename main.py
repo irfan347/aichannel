@@ -7,7 +7,8 @@ Scene "screen" types: title, chat, steps, bullets, checklist, stock (stock foota
 Use **word** in titles/items to highlight a word in yellow.
 """
 import argparse, json, math, os, re
-import voice, visuals, render, character, slides, anim
+import shutil
+import voice, visuals, render, character, slides, anim, sfx
 
 FPS = 30
 GAP = 0.35  # breath between scenes (seconds)
@@ -52,7 +53,8 @@ def build(script, out_dir, music, vertical, audio):
             slide = R.frames(html, frames, work, f"s{i}{tag}", transparent=bool(clip))
             char = (character.build_bubble_frames(wav, frames / FPS, work, i, 420 if vertical else 340)
                     if sc.get("presenter", True) else None)
-            scenes.append(dict(frames=frames, wav=wav, words=words, slide=slide, clip=clip, char=char))
+            scenes.append(dict(frames=frames, wav=wav, words=words, slide=slide, clip=clip, char=char,
+                               events=sfx.events_from_html(html)))
             print(f"[{'short' if vertical else 'video'}] scene {i + 1}/{n} ready ({frames / FPS:.1f}s)")
     return render.render(scenes, work, os.path.join(out_dir, "short.mp4" if vertical else "final.mp4"),
                          music, vertical)
@@ -63,6 +65,9 @@ def make_thumbnail(script, out_dir):
     face = os.path.join(work, "thumb_char.png")
     character.frame(True, 3, 1, 0).save(face)
     out = os.path.join(out_dir, "thumbnail.png")
+    if script.get("thumbnail_file") and os.path.exists(script["thumbnail_file"]):  # hand-designed thumbnail
+        shutil.copy(script["thumbnail_file"], out)
+        return out
     if script.get("thumbnail"):  # before-vs-after style
         return slides.thumbnail_vs(script["thumbnail"], face, out)
     text = script.get("thumbnail_text") or " ".join(script["title"].split()[:4])
