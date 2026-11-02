@@ -1,0 +1,262 @@
+{
+  "title": "5 Excel Tasks AI Does in Seconds (Copy These Prompts)",
+  "short_title": "5 Excel tasks AI does in seconds",
+  "thumbnail_file": "scripts/video04_thumbnail.png",
+  "description": "Five everyday Excel jobs that used to take ages, done in seconds with a free AI chatbot. Copy the prompts and formulas:\n\n1. Pull first names from full names\n2. Count anything (COUNTIF)\n3. Remove duplicates (UNIQUE)\n4. Percentage change\n5. Turn numbers into a chart\nBonus: highlight overdue dates automatically\n\nWorks in Excel and Google Sheets, with ChatGPT, Claude, Gemini or any free AI chatbot.\n\nSubscribe to Work Hacked for a new work shortcut every week.\n\nThis video uses AI-generated narration and visuals.\n\n#excel #AItools #productivity",
+  "tags": [
+    "excel tips",
+    "excel formulas",
+    "chatgpt excel",
+    "ai excel",
+    "excel tricks",
+    "google sheets",
+    "countif",
+    "unique formula",
+    "excel chart",
+    "excel for beginners",
+    "ai tools for work",
+    "productivity hacks"
+  ],
+  "short_scenes": [
+    0,
+    2,
+    3,
+    5,
+    7,
+    8,
+    13
+  ],
+  "scenes": [
+    {
+      "narration": "These five Excel tasks used to take me ages. Now AI does each one in seconds, and I'll give you the exact prompts so you can copy them.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "5 Excel tasks AI does in **seconds**",
+        "subtitle": "Copy these prompts"
+      }
+    },
+    {
+      "narration": "All you need is any free AI chatbot, like ChatGPT, Claude or Gemini. Every formula here works in both Excel and Google Sheets.",
+      "screen": {
+        "type": "bullets",
+        "tag": "What you need",
+        "title": "Free tools that work",
+        "items": [
+          "Any free AI chatbot",
+          "Excel or Google Sheets",
+          "Five minutes"
+        ]
+      }
+    },
+    {
+      "narration": "Task one. Pull first names out of full names. Imagine a list of five hundred customers. Doing this by hand would take forever.",
+      "screen": {
+        "type": "chat",
+        "tag": "Task 1",
+        "user": "Full names are in column A, like Sarah Johnson. Give me a formula that returns just the first name.",
+        "ai": "=LEFT(A2, FIND(\" \", A2) - 1)"
+      }
+    },
+    {
+      "narration": "Put it in the first row and drag it down. Every first name appears instantly.",
+      "screen": {
+        "type": "formula",
+        "tag": "Result",
+        "formula": "=LEFT(A2, FIND(\" \", A2) - 1)",
+        "cols": [
+          "A: Full name",
+          "B: First name"
+        ],
+        "rows": [
+          [
+            "Sarah Johnson",
+            "?"
+          ]
+        ],
+        "result": "Sarah"
+      }
+    },
+    {
+      "narration": "Task two. Count things. How many invoices are paid? How many orders came from one city? Just ask.",
+      "screen": {
+        "type": "formula",
+        "tag": "Task 2",
+        "title": "How many are paid?",
+        "formula": "=COUNTIF(B:B, \"Paid\")",
+        "cols": [
+          "A: Invoice",
+          "B: Status"
+        ],
+        "rows": [
+          [
+            "#101",
+            "Paid"
+          ],
+          [
+            "#102",
+            "Unpaid"
+          ],
+          [
+            "#103",
+            "Paid"
+          ],
+          [
+            "#104",
+            "Paid"
+          ],
+          [
+            "Paid total:",
+            "?"
+          ]
+        ],
+        "result": "3"
+      }
+    },
+    {
+      "narration": "Task three. Remove duplicates. If the same name shows up again and again, one formula gives you a clean list with each name only once.",
+      "screen": {
+        "type": "formula",
+        "tag": "Task 3",
+        "title": "A clean list, no repeats",
+        "formula": "=UNIQUE(A2:A5)",
+        "cols": [
+          "A: Names",
+          "C: Unique"
+        ],
+        "rows": [
+          [
+            "Ali",
+            "?"
+          ],
+          [
+            "Sara",
+            "?"
+          ],
+          [
+            "Ali",
+            "?"
+          ],
+          [
+            "John",
+            ""
+          ]
+        ],
+        "result": [
+          "Ali",
+          "Sara",
+          "John"
+        ]
+      }
+    },
+    {
+      "narration": "Task four. Percentage change. Did sales go up or down from last month, and by how much? Ask AI, and format the cell as a percentage.",
+      "screen": {
+        "type": "formula",
+        "tag": "Task 4",
+        "title": "Growth from last month",
+        "formula": "=(C2 - B2) / B2",
+        "cols": [
+          "A: Product",
+          "B: Jan",
+          "C: Feb",
+          "D: Change"
+        ],
+        "rows": [
+          [
+            "Laptops",
+            "2,000",
+            "2,500",
+            "?"
+          ]
+        ],
+        "result": "25%"
+      }
+    },
+    {
+      "narration": "Task five, and this is the one people love. Turn your numbers into a chart. Ask AI which chart fits your data, and the exact steps to make it.",
+      "screen": {
+        "type": "chat",
+        "tag": "Task 5",
+        "user": "I have monthly sales in columns A and B. Which chart should I use, and how do I make it in Excel?",
+        "ai": "Use a column chart. Select A1 to B5, go to Insert, then Column Chart."
+      }
+    },
+    {
+      "narration": "A few clicks later, your boring table becomes a chart that anyone can understand at a glance.",
+      "screen": {
+        "type": "chart",
+        "tag": "Result",
+        "title": "Monthly sales",
+        "labels": [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr"
+        ],
+        "values": [
+          2000,
+          2500,
+          3100,
+          2800
+        ],
+        "prefix": "$"
+      }
+    },
+    {
+      "narration": "Bonus tip. Ask AI to highlight problems for you, like overdue dates, using conditional formatting.",
+      "screen": {
+        "type": "chat",
+        "tag": "Bonus",
+        "user": "How do I make dates in column D turn red if they are before today?",
+        "ai": "Select column D, go to Conditional Formatting, use a formula rule: =$D2<TODAY(), and choose red fill."
+      }
+    },
+    {
+      "narration": "And remember, if any formula gives an error, paste the error back into the chat. AI will usually tell you exactly what to fix.",
+      "screen": {
+        "type": "chat",
+        "tag": "Fix errors",
+        "user": "My formula shows #VALUE!. Why?",
+        "ai": "One of the cells probably has text instead of a number. Check for spaces or letters."
+      }
+    },
+    {
+      "narration": "Before you trust any formula, test it on a copy of your file, and check a few results by hand.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Never skip this",
+        "title": "Before you trust it",
+        "items": [
+          "Test on a copy",
+          "Check a few results",
+          "Make sure ranges are right"
+        ]
+      }
+    },
+    {
+      "narration": "So, five tasks. First names, counting, removing duplicates, percentage change, and charts. All in seconds.",
+      "screen": {
+        "type": "steps",
+        "tag": "Recap",
+        "title": "5 tasks, done in seconds",
+        "items": [
+          "Pull first names",
+          "Count anything",
+          "Remove duplicates",
+          "Percent change",
+          "Make a chart"
+        ]
+      }
+    },
+    {
+      "narration": "If this saved you time, subscribe to Work Hacked. A new work shortcut every week.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Subscribe for a new **work shortcut** every week",
+        "subtitle": "Next: Pivot tables with AI, no learning needed"
+      }
+    }
+  ]
+}

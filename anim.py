@@ -65,6 +65,13 @@ td,th{border:1.5px solid #e2e8f0;padding:14px 20px;text-align:left;white-space:n
 th{background:#f8fafc;color:#64748b;font-weight:700;font-size:28px}
 td.res{background:#dcfce7;font-weight:800;color:#166534}
 td.target{outline:4px solid #16a34a;outline-offset:-4px}
+.chart{display:flex;align-items:flex-end;gap:36px;height:560px;padding:40px 46px 30px;background:#0f172a;border-radius:26px;
+ border:1.5px solid rgba(255,255,255,.12);box-shadow:0 40px 90px rgba(0,0,0,.55)}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bar{width:100%;border-radius:14px 14px 4px 4px;background:linear-gradient(180deg,#facc15,#f59e0b);transform-origin:bottom}
+.bar.top{background:linear-gradient(180deg,#4ade80,#16a34a)}
+.val{font-size:34px;font-weight:800;margin-bottom:12px}
+.lab{font-size:30px;color:#94a3b8;margin-top:14px;font-weight:600}
 """
 LAND = "body{width:1920px;height:1080px}.area{left:110px;top:110px;width:1290px;height:800px}"
 VERT = ("body{width:1080px;height:1920px}.area{left:70px;top:190px;width:940px;height:1060px}"
@@ -79,7 +86,7 @@ function render(t){
  document.querySelectorAll('[data-t]').forEach(el=>{
   let p=ease(clamp((t-(+el.dataset.t))/0.4)); const a=el.dataset.a||'up';
   el.style.opacity=p;
-  el.style.transform=a==='pop'?`scale(${0.92+0.08*p})`:a==='left'?`translateX(${(1-p)*-46}px)`:`translateY(${(1-p)*34}px)`;
+  el.style.transform=a==='grow'?`scaleY(${p})`:a==='pop'?`scale(${0.92+0.08*p})`:a==='left'?`translateX(${(1-p)*-46}px)`:`translateY(${(1-p)*34}px)`;
   sig.push(Math.round(p*60));
  });
  document.querySelectorAll('[data-act0]').forEach(el=>{
@@ -184,12 +191,17 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
         r0 = f1 + 0.4
         cols = "".join(f"<th>{_e(c)}</th>" for c in sc["cols"])
         rows = ""
+        res = sc["result"] if isinstance(sc["result"], list) else [sc["result"]]
+        k_res = 0
         for ri, row in enumerate(sc["rows"]):
             cells = ""
             for ci, v in enumerate(row):
                 if v == "?":
-                    cells += (f"<td class='res target'><span style='opacity:0' data-sfx=ding data-t={r0:.2f} data-a=pop>"
-                              f"{_e(sc['result'])}</span></td>")
+                    rt = r0 + 0.12 * k_res
+                    sfx = "data-sfx=ding " if k_res == 0 else ""
+                    cells += (f"<td class='res{' target' if k_res == 0 else ''}'><span style='opacity:0' {sfx}data-t={rt:.2f} data-a=pop>"
+                              f"{_e(res[min(k_res, len(res) - 1)])}</span></td>")
+                    k_res += 1
                 else:
                     cells += f"<td>{_e(v)}</td>"
             rows += f"<tr>{cells}</tr>"
@@ -197,6 +209,17 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
         fx = (f"<div class=fx><b>fx</b><div class=tw data-sfx=type data-type0={f0:.2f} data-type1={f1:.2f} data-full=\"{_plain(f)}\">"
               f"<span class=ghost>{_plain(f)}</span><span class=txt><span class=tt></span><span class=caret></span></span></div></div>")
         inner = f"{tag}{head}<div class=sheet data-t=0.15 data-a=pop>{fx}<table><tr>{cols}</tr>{rows}</table></div>"
+    elif t == "chart":
+        vals = sc["values"]; mx = max(vals); pre = sc.get("prefix", "")
+        cols = ""
+        for k, (lab, v) in enumerate(zip(sc["labels"], vals)):
+            bt = 0.9 + k * 0.45
+            cls = "bar top" if v == mx else "bar"
+            cols += (f"<div class=col><div class=val data-t={bt + 0.3:.2f}>{_e(pre)}{v:,}</div>"
+                     f"<div class='{cls}' data-t={bt:.2f} data-a=grow style='height:{int(380 * v / mx)}px'></div>"
+                     f"<div class=lab>{_e(lab)}</div></div>")
+        head = f"<h2 data-t=0.1>{_e(sc['title'])}</h2>" if sc.get("title") else ""
+        inner = f"{tag}{head}<div class=chart data-t=0.2 data-a=pop>{cols}</div>"
     else:  # title (also used over stock footage)
         sub = ""
         if sc.get("subtitle"):
