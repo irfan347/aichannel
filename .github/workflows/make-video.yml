@@ -4,7 +4,7 @@ on:
     inputs:
       script:
         description: "Script file in scripts/"
-        default: "scripts/video04.json"
+        default: "scripts/video05.json"
       format:
         description: "both / landscape / vertical"
         default: "both"

@@ -186,9 +186,9 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
             rows += f"<div class=item data-t={t0:.2f} data-a=left data-act0={t0:.2f} data-act1={t1:.2f}>{ic}<div>{_e(it)}</div></div>"
         inner = f"{tag}<h2 data-t=0.1>{_e(sc['title'])}</h2><div class=list>{rows}</div>"
     elif t == "formula":
-        f = sc["formula"]
-        f0 = 0.6; f1 = f0 + min(len(f) / 22, max(sp * 0.5, 1.2))
-        r0 = f1 + 0.4
+        f = sc.get("formula", "")
+        f0 = 0.6; f1 = f0 + min(len(f) / 22, max(sp * 0.5, 1.2)) if f else 0.6
+        r0 = sc.get("result_at", f1 + 0.4)
         cols = "".join(f"<th>{_e(c)}</th>" for c in sc["cols"])
         rows = ""
         res = sc["result"] if isinstance(sc["result"], list) else [sc["result"]]
@@ -208,6 +208,8 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
         head = f"<h2 data-t=0.1>{_e(sc['title'])}</h2>" if sc.get("title") else ""
         fx = (f"<div class=fx><b>fx</b><div class=tw data-sfx=type data-type0={f0:.2f} data-type1={f1:.2f} data-full=\"{_plain(f)}\">"
               f"<span class=ghost>{_plain(f)}</span><span class=txt><span class=tt></span><span class=caret></span></span></div></div>")
+        if not f:
+            fx = ""
         inner = f"{tag}{head}<div class=sheet data-t=0.15 data-a=pop>{fx}<table><tr>{cols}</tr>{rows}</table></div>"
     elif t == "chart":
         vals = sc["values"]; mx = max(vals); pre = sc.get("prefix", "")

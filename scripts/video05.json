@@ -1,0 +1,264 @@
+{
+  "title": "How to Make a Pivot Table With AI (Excel & Google Sheets)",
+  "short_title": "Pivot tables made easy with AI",
+  "thumbnail_file": "scripts/video05_thumbnail.png",
+  "description": "Pivot tables look scary, but they're the fastest way to summarize a big spreadsheet. In this video a free AI chatbot walks you through making one, step by step:\n\n- What a pivot table actually does\n- The prompt to get exact steps for your data\n- Rows, Values and Columns explained simply\n- Turning it into a chart\n- Recommended / suggested pivot tables\n- Getting AI to write a summary for your boss\n- Refreshing and checking your totals\n\nWorks in Excel and Google Sheets, with ChatGPT, Claude, Gemini or any free AI chatbot.\n\nSubscribe to Work Hacked for a new work shortcut every week.\n\nThis video uses AI-generated narration and visuals.\n\n#excel #pivottable #AItools",
+  "tags": [
+    "pivot table",
+    "excel pivot table",
+    "pivot table tutorial",
+    "google sheets pivot table",
+    "chatgpt excel",
+    "ai excel",
+    "excel for beginners",
+    "excel tips",
+    "data analysis excel",
+    "ai tools for work",
+    "productivity hacks",
+    "work smarter"
+  ],
+  "short_scenes": [
+    0,
+    2,
+    5,
+    6,
+    7,
+    14
+  ],
+  "scenes": [
+    {
+      "narration": "Pivot tables scare a lot of people. But they're the fastest way to make sense of a big spreadsheet. Today, AI will walk you through one in about a minute.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Pivot tables, **made easy** with AI",
+        "subtitle": "No experience needed"
+      }
+    },
+    {
+      "narration": "First, what is a pivot table? It takes hundreds or thousands of rows and turns them into a small summary, like total sales for each region.",
+      "screen": {
+        "type": "steps",
+        "tag": "In one sentence",
+        "title": "What a pivot table does",
+        "items": [
+          "Takes thousands of rows",
+          "Groups them",
+          "Gives you a small summary"
+        ]
+      }
+    },
+    {
+      "narration": "Here's our example. Every sale is a row, with the region, the product and the amount. With real data this could be five thousand rows.",
+      "screen": {
+        "type": "formula",
+        "tag": "Our data",
+        "title": "Every sale is a row",
+        "cols": [
+          "A: Region",
+          "B: Product",
+          "C: Amount"
+        ],
+        "rows": [
+          [
+            "East",
+            "Laptop",
+            "1,200"
+          ],
+          [
+            "West",
+            "Laptop",
+            "950"
+          ],
+          [
+            "East",
+            "Phone",
+            "800"
+          ],
+          [
+            "West",
+            "Phone",
+            "600"
+          ],
+          [
+            "North",
+            "Laptop",
+            "700"
+          ]
+        ],
+        "result": ""
+      }
+    },
+    {
+      "narration": "Now, instead of guessing, tell the AI what your columns are and what question you want answered.",
+      "screen": {
+        "type": "chat",
+        "tag": "The prompt",
+        "user": "My data has Region in column A, Product in B and Amount in C. I want total sales per region. How do I make a pivot table in Excel?",
+        "ai": "Select your data, go to Insert, then PivotTable, and click OK. Drag Region to Rows and Amount to Values."
+      }
+    },
+    {
+      "narration": "Follow the steps. Select your data, click Insert, then PivotTable, and press OK.",
+      "screen": {
+        "type": "steps",
+        "tag": "Step 1",
+        "title": "Create the pivot table",
+        "items": [
+          "Select your data",
+          "Insert, then PivotTable",
+          "Click OK"
+        ]
+      }
+    },
+    {
+      "narration": "Then drag the fields into place. Region goes into Rows, and Amount goes into Values. Excel adds them up for you.",
+      "screen": {
+        "type": "steps",
+        "tag": "Step 2",
+        "title": "Drag two fields",
+        "items": [
+          "Region into Rows",
+          "Amount into Values",
+          "Excel sums it up"
+        ]
+      }
+    },
+    {
+      "narration": "And here's the result. Five rows became a clean summary, with a grand total at the bottom. With five thousand rows, it works exactly the same.",
+      "screen": {
+        "type": "formula",
+        "tag": "Result",
+        "title": "Total sales per region",
+        "cols": [
+          "Region",
+          "Sum of Amount"
+        ],
+        "rows": [
+          [
+            "East",
+            "?"
+          ],
+          [
+            "North",
+            "?"
+          ],
+          [
+            "West",
+            "?"
+          ],
+          [
+            "Grand Total",
+            "?"
+          ]
+        ],
+        "result": [
+          "2,000",
+          "700",
+          "1,550",
+          "4,250"
+        ],
+        "result_at": 1.2
+      }
+    },
+    {
+      "narration": "You can turn it into a chart in two clicks, so you can see right away which region is winning.",
+      "screen": {
+        "type": "chart",
+        "tag": "See it",
+        "title": "Sales by region",
+        "labels": [
+          "East",
+          "West",
+          "North"
+        ],
+        "values": [
+          2000,
+          1550,
+          700
+        ],
+        "prefix": "$"
+      }
+    },
+    {
+      "narration": "Want more detail? Ask AI how to split it by product too. The answer is simple. Drag Product into Columns.",
+      "screen": {
+        "type": "chat",
+        "tag": "Go deeper",
+        "user": "How do I see each product's sales inside each region?",
+        "ai": "Drag Product into the Columns area. You'll get one column for each product."
+      }
+    },
+    {
+      "narration": "Here's a shortcut. In Excel, Insert then Recommended PivotTables gives you ready-made options. In Google Sheets, the pivot table editor shows suggestions too.",
+      "screen": {
+        "type": "bullets",
+        "tag": "Shortcut",
+        "title": "Let the app suggest one",
+        "items": [
+          "Excel: Recommended PivotTables",
+          "Google Sheets: suggested pivot tables",
+          "Pick one and adjust it"
+        ]
+      }
+    },
+    {
+      "narration": "Now the part most people forget. Paste your pivot numbers into the chat, and ask AI to write a short summary for your boss.",
+      "screen": {
+        "type": "chat",
+        "tag": "Pro tip",
+        "user": "Sales by region: East 2,000, West 1,550, North 700. Write a 2-line summary for my manager.",
+        "ai": "East led sales with 2,000, followed by West at 1,550. North is lowest at 700 and may need attention."
+      }
+    },
+    {
+      "narration": "One more thing. When your data changes in Excel, right click the pivot table and choose Refresh. Google Sheets updates on its own.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Keep it updated",
+        "title": "When your data changes",
+        "items": [
+          "Excel: right click, Refresh",
+          "Google Sheets: updates itself",
+          "Check the grand total"
+        ]
+      }
+    },
+    {
+      "narration": "And always check that the grand total matches the total of your original data. If it doesn't, some rows were left out of your selection.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Never skip this",
+        "title": "Before you share it",
+        "items": [
+          "Grand total matches your data",
+          "All rows were selected",
+          "Numbers look right"
+        ]
+      }
+    },
+    {
+      "narration": "So, describe your columns, ask your question, follow the steps, and let the pivot table do the work.",
+      "screen": {
+        "type": "steps",
+        "tag": "Recap",
+        "title": "Pivot tables with AI",
+        "items": [
+          "Describe your columns",
+          "Ask your question",
+          "Follow the steps",
+          "Summarize with AI"
+        ]
+      }
+    },
+    {
+      "narration": "If this helped, subscribe to Work Hacked. A new work shortcut every week.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Subscribe for a new **work shortcut** every week",
+        "subtitle": "More Excel and AI shortcuts coming"
+      }
+    }
+  ]
+}
