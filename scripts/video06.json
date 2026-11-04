@@ -1,0 +1,281 @@
+{
+  "title": "How to Clean Messy Data in Excel With AI (Fast & Free)",
+  "short_title": "Clean messy Excel data in seconds",
+  "thumbnail_file": "scripts/video06_thumbnail.png",
+  "description": "Messy spreadsheets waste hours. In this video a free AI chatbot helps you fix the most common data problems in Excel and Google Sheets:\n\n- Find what's wrong with your data\n- Remove extra spaces (TRIM)\n- Fix random capitals (PROPER)\n- Clean phone numbers (SUBSTITUTE)\n- Remove duplicates\n- Join or split names\n- Count empty cells (COUNTBLANK)\n- Google Sheets one-click cleanup\n\nWorks with ChatGPT, Claude, Gemini or any free AI chatbot.\n\nSubscribe to Work Hacked for a new work shortcut every week.\n\nThis video uses AI-generated narration and visuals.\n\n#excel #datacleaning #AItools",
+  "tags": [
+    "clean data excel",
+    "data cleaning",
+    "excel tips",
+    "trim function",
+    "proper function",
+    "remove duplicates excel",
+    "google sheets cleanup",
+    "chatgpt excel",
+    "ai excel",
+    "excel for beginners",
+    "excel formulas",
+    "productivity hacks"
+  ],
+  "short_scenes": [
+    0,
+    3,
+    4,
+    5,
+    6,
+    14
+  ],
+  "scenes": [
+    {
+      "narration": "Messy spreadsheets waste hours. Extra spaces, random capitals, duplicates, broken phone numbers. Today AI fixes all of it in minutes, and I'll show you exactly how.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Clean **messy data** in minutes",
+        "subtitle": "Excel and Google Sheets"
+      }
+    },
+    {
+      "narration": "Step zero, and don't skip it. Make a copy of your file first, so you can always go back.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Step 0",
+        "title": "Before you start",
+        "items": [
+          "Make a copy of your file",
+          "Work on the copy",
+          "Keep the original safe"
+        ]
+      }
+    },
+    {
+      "narration": "Start by pasting five or six messy rows into an AI chatbot, and ask it what's wrong with your data. It spots problems you might miss.",
+      "screen": {
+        "type": "chat",
+        "tag": "Find the problems",
+        "user": "Here are 5 rows from my customer list: [paste]. What's wrong with this data, and how do I fix each problem in Excel?",
+        "ai": "1. Extra spaces in names. 2. Mixed capital letters. 3. Duplicate customers. 4. Phone numbers have dashes."
+      }
+    },
+    {
+      "narration": "Problem one. Extra spaces. They're invisible, but they break lookups and sorting. One formula removes them.",
+      "screen": {
+        "type": "formula",
+        "tag": "Problem 1",
+        "title": "Remove extra spaces",
+        "formula": "=TRIM(A2)",
+        "cols": [
+          "A: Messy",
+          "B: Clean"
+        ],
+        "rows": [
+          [
+            "  john   smith ",
+            "?"
+          ]
+        ],
+        "result": "john smith"
+      }
+    },
+    {
+      "narration": "Problem two. Random capital letters. Wrap it in PROPER, and every name looks neat.",
+      "screen": {
+        "type": "formula",
+        "tag": "Problem 2",
+        "title": "Fix the capitals",
+        "formula": "=PROPER(TRIM(A2))",
+        "cols": [
+          "A: Messy",
+          "B: Clean"
+        ],
+        "rows": [
+          [
+            "jOHN sMITH",
+            "?"
+          ],
+          [
+            "MARIA lopez",
+            "?"
+          ]
+        ],
+        "result": [
+          "John Smith",
+          "Maria Lopez"
+        ]
+      }
+    },
+    {
+      "narration": "Problem three. Phone numbers full of dashes. Ask AI to remove them, and you get one clean format.",
+      "screen": {
+        "type": "formula",
+        "tag": "Problem 3",
+        "title": "Clean phone numbers",
+        "formula": "=SUBSTITUTE(A2, \"-\", \"\")",
+        "cols": [
+          "A: Messy",
+          "B: Clean"
+        ],
+        "rows": [
+          [
+            "555-123-4567",
+            "?"
+          ]
+        ],
+        "result": "5551234567"
+      }
+    },
+    {
+      "narration": "Problem four. Duplicates. You don't even need a formula. In Excel, go to Data, then Remove Duplicates. In Google Sheets, it's Data, Data cleanup, Remove duplicates.",
+      "screen": {
+        "type": "steps",
+        "tag": "Problem 4",
+        "title": "Remove duplicates",
+        "items": [
+          "Select your data",
+          "Excel: Data, Remove Duplicates",
+          "Sheets: Data, Data cleanup"
+        ]
+      }
+    },
+    {
+      "narration": "Problem five. First and last names stuck in one cell, or split when you need them together. AI gives you both fixes.",
+      "screen": {
+        "type": "chat",
+        "tag": "Problem 5",
+        "user": "First names are in A and last names in B. How do I join them into one cell with a space?",
+        "ai": "=A2 & \" \" & B2"
+      }
+    },
+    {
+      "narration": "Drag it down, and the full names fill in for every row.",
+      "screen": {
+        "type": "formula",
+        "tag": "Result",
+        "formula": "=A2 & \" \" & B2",
+        "cols": [
+          "A: First",
+          "B: Last",
+          "C: Full name"
+        ],
+        "rows": [
+          [
+            "Maria",
+            "Lopez",
+            "?"
+          ],
+          [
+            "John",
+            "Smith",
+            "?"
+          ]
+        ],
+        "result": [
+          "Maria Lopez",
+          "John Smith"
+        ]
+      }
+    },
+    {
+      "narration": "Need the opposite? To split one column into two, use Text to Columns in Excel, or Split text to columns in Google Sheets.",
+      "screen": {
+        "type": "bullets",
+        "tag": "The opposite",
+        "title": "Split one column into two",
+        "items": [
+          "Excel: Data, Text to Columns",
+          "Sheets: Data, Split text to columns",
+          "Choose space as the separator"
+        ]
+      }
+    },
+    {
+      "narration": "Problem six. Empty cells. Ask AI for a quick count, so you know how much data is missing.",
+      "screen": {
+        "type": "formula",
+        "tag": "Problem 6",
+        "title": "How many cells are empty?",
+        "formula": "=COUNTBLANK(B2:B6)",
+        "cols": [
+          "A: Name",
+          "B: Email"
+        ],
+        "rows": [
+          [
+            "Maria",
+            "maria@mail.com"
+          ],
+          [
+            "John",
+            ""
+          ],
+          [
+            "Ali",
+            "ali@mail.com"
+          ],
+          [
+            "Sara",
+            ""
+          ],
+          [
+            "Tom",
+            "tom@mail.com"
+          ],
+          [
+            "Empty:",
+            "?"
+          ]
+        ],
+        "result": "2"
+      }
+    },
+    {
+      "narration": "Google Sheets users get a bonus. Under Data, Data cleanup, there's Cleanup suggestions and Trim whitespace, which fix common problems in one click.",
+      "screen": {
+        "type": "bullets",
+        "tag": "Sheets bonus",
+        "title": "One-click cleanup",
+        "items": [
+          "Data, Data cleanup",
+          "Cleanup suggestions",
+          "Trim whitespace"
+        ]
+      }
+    },
+    {
+      "narration": "Last step. Once your clean columns look right, copy them and paste as values, so they stay fixed even if you delete the messy ones.",
+      "screen": {
+        "type": "checklist",
+        "tag": "Finish",
+        "title": "Lock in your clean data",
+        "items": [
+          "Copy the clean column",
+          "Paste as values",
+          "Then delete the messy one"
+        ]
+      }
+    },
+    {
+      "narration": "So, ask AI what's wrong, fix spaces, capitals, phone numbers and duplicates, join or split names, and check for blanks. Your data is ready.",
+      "screen": {
+        "type": "steps",
+        "tag": "Recap",
+        "title": "Clean data checklist",
+        "items": [
+          "Spaces and capitals",
+          "Phone numbers",
+          "Duplicates",
+          "Blanks"
+        ]
+      }
+    },
+    {
+      "narration": "If this saved you time, subscribe to Work Hacked. A new work shortcut every week.",
+      "screen": {
+        "type": "title",
+        "tag": "Work Hacked",
+        "title": "Subscribe for a new **work shortcut** every week",
+        "subtitle": "Next: a simple dashboard with AI"
+      }
+    }
+  ]
+}
