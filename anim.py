@@ -3,6 +3,7 @@ Each scene is an HTML page whose elements appear at the moment the voice talks a
 (fade + slide-in, typing prompts, streaming AI replies). Frames are rendered deterministically with
 headless Chromium (only changed frames are captured) so timing is exact."""
 import base64, html, os, re
+import phone as phone_ui
 from playwright.sync_api import sync_playwright
 
 FPS = 30
@@ -94,19 +95,19 @@ body.ur .who{font-size:24px}
 body.ur .win .bar{font-size:26px}
 body.ur .caret{margin:0 3px 0 0}
 """
-# brand themes: accent colours swapped in over the default indigo/yellow look
-THEMES = {"rabta": """body{background:#080d14}
-.bg{background:radial-gradient(1200px 700px at 88% -10%,rgba(191,255,118,.20),transparent 60%),
- radial-gradient(900px 600px at -10% 112%,rgba(84,221,197,.16),transparent 60%),
+# brand themes (rabta = the app's near-black canvas and amber accent): accent colours swapped in over the default indigo/yellow look
+THEMES = {"rabta": """body{background:#0e0f12}
+.bg{background:radial-gradient(1200px 700px at 88% -10%,rgba(245,184,65,.20),transparent 60%),
+ radial-gradient(900px 600px at -10% 112%,rgba(245,184,65,.16),transparent 60%),
  radial-gradient(rgba(255,255,255,.05) 1.6px,transparent 1.6px) 0 0/38px 38px}
-.hl{color:#bfff76}.tag{background:#bfff76;color:#080d14}.prog i.on{background:#bfff76}
-.sub{color:#54ddc5}.ic{background:#172230;color:#bfff76;border:2px solid rgba(191,255,118,.5)}
-.ic.ok{background:#bfff76;color:#080d14}.item.act{background:rgba(191,255,118,.10);border-color:rgba(191,255,118,.65)}
-.win{background:#111b27}.win .bar{background:#172230}.u{background:#3a6e12}.a{background:#172230}
-.brand{color:#f3f6f5}
+.hl{color:#f5b841}.tag{background:#f5b841;color:#0e0f12}.prog i.on{background:#f5b841}
+.sub{color:#e9e6df}.ic{background:#17191e;color:#f5b841;border:2px solid rgba(245,184,65,.5)}
+.ic.ok{background:#f5b841;color:#0e0f12}.item.act{background:rgba(245,184,65,.10);border-color:rgba(245,184,65,.65)}
+.win{background:#17191e}.win .bar{background:#17191e}.u{background:#3a2f17}.a{background:#17191e}
+.brand{color:#f4f2ee}
 body.clear{background:transparent}
-body.clear .bg{background:linear-gradient(180deg,rgba(8,13,20,.55) 0%,rgba(8,13,20,.35) 45%,rgba(8,13,20,.85) 100%)}
-body.clear .item{background:rgba(8,13,20,.72)}body.clear .item.act{background:rgba(23,34,48,.88)}
+body.clear .bg{background:linear-gradient(180deg,rgba(14,15,18,.55) 0%,rgba(14,15,18,.35) 45%,rgba(14,15,18,.85) 100%)}
+body.clear .item{background:rgba(14,15,18,.72)}body.clear .item.act{background:rgba(23,25,30,.9)}
 body.vert.clear .area{top:760px;height:1060px}
 body.clear h1,body.clear h2,body.clear .sub{text-shadow:0 4px 18px rgba(0,0,0,.85)}"""}
 _FONT = None
@@ -146,6 +147,12 @@ function render(t){
   el.querySelector('.tt').textContent=full.slice(0,n);
   let on=false; if(c){on=t>=a-0.3&&t<b+0.5&&(t<b||Math.floor(t*2.5)%2===0); c.style.opacity=on?1:0}
   sig.push(n,on?1:0);
+ });
+ document.querySelectorAll('[data-w0]').forEach(el=>{
+  const p=clamp((t-(+el.dataset.w0))/Math.max(+el.dataset.w1-(+el.dataset.w0),.01)); el.style.width=(p*100).toFixed(1)+'%'; sig.push(Math.round(p*200));
+ });
+ document.querySelectorAll('[data-pct0]').forEach(el=>{
+  const p=clamp((t-(+el.dataset.pct0))/Math.max(+el.dataset.pct1-(+el.dataset.pct0),.01)); el.textContent=Math.round(p*100);
  });
  return sig.join(',');
 }
@@ -255,6 +262,20 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False, style=None):
         if not f:
             fx = ""
         inner = f"{tag}{head}<div class=sheet data-t=0.15 data-a=pop>{fx}<table><tr>{cols}</tr>{rows}</table></div>"
+    elif t == "phone":  # the Rabta app on a phone, next to the title (and an optional list) or under it (vertical)
+        head = f"<h2 data-t=0.1>{_e(sc['title'])}</h2>" if sc.get("title") else ""
+        if vertical:
+            inner = f"{tag}{head}" + phone_ui.phone(sc["app"], sp, sc, 1.42)
+        else:
+            rows = ""
+            if sc.get("items"):
+                ts = _list_times(words, sc["items"], sp)
+                for k, (it, t0) in enumerate(zip(sc["items"], ts)):
+                    t1 = ts[k + 1] if k + 1 < len(ts) else 999
+                    rows += (f"<div class=item data-t={t0:.2f} data-a=left data-act0={t0:.2f} data-act1={t1:.2f}>"
+                             f"<div class='ic ok'>&#10003;</div><div>{_e(it)}</div></div>")
+            inner = (f"<div class=ph-split><div class=ph-text>{tag}{head}<div class=list>{rows}</div></div>"
+                     + phone_ui.phone(sc["app"], sp, sc, 0.98) + "</div>")
     elif t == "chart":
         vals = sc["values"]; mx = max(vals); pre = sc.get("prefix", "")
         cols = ""
@@ -277,8 +298,10 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False, style=None):
     logo = f"<img src='data:image/png;base64,{lg}'>" if lg else ""
     ur = style.get("lang") == "ur"
     css = (CSS + (VERT if vertical else LAND) + THEMES.get(style.get("theme"), "")
-           + (_font_css() + URDU if ur else ""))
-    cls = " ".join(c for c in ("clear" if clear else "", "ur" if ur else "", "vert" if vertical else "") if c)
+           + (_font_css() + URDU if ur else "") + (phone_ui.CSS if t == "phone" else ""))
+    if t == "phone" and not ur:
+        css += _font_css()  # Urdu chat text inside the phone
+    cls = " ".join(c for c in ("clear" if clear else "", "ur" if ur else "", "vert" if vertical else "", "phv" if t == "phone" else "") if c)
     return (f"<html><head><style>{css}</style><script>{JS}</script></head>"
             f"<body class='{cls}'><div class=bg></div><div class=prog>{prog}</div>"
             f"<div class=brand>{logo}{_e(style.get('brand', 'WORK HACKED'))}</div><div class=area>{inner}</div></body></html>")
