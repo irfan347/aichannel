@@ -5,7 +5,9 @@
 
 Scene "screen" types: title, chat, steps, bullets, checklist, stock (stock footage, needs PEXELS_API_KEY).
 Script options: "voice" (Edge voice, e.g. ur-PK-AsadNeural), "voice_rate", "captions": false,
-"style": {"brand", "logo" (file in brand/), "theme" (e.g. rabta), "lang": "ur" for Urdu right-to-left}.
+"style": {"brand", "logo" (file in brand/), "theme" (e.g. rabta), "lang": "ur" for Urdu right-to-left,
+"character": "pro" (presenter in blazer and tie), "presenter": "stage" (big presenter beside the slides)},
+"music": "upbeat" (generated ad-style track when no music.mp3), "music_volume" (default 0.16).
 Use **word** in titles/items to highlight a word in yellow.
 """
 import argparse, json, math, os, re
@@ -40,6 +42,11 @@ def build(script, out_dir, music, vertical, audio):
     tag = "v" if vertical else "h"
     n = len(script["scenes"])
     scenes = []
+    style = script.get("style") or {}
+    character.STYLE = style.get("character", "classic")
+    stage = style.get("presenter") == "stage"  # big half-body presenter beside the slides instead of a facecam bubble
+    if script.get("music") == "upbeat" and not os.path.exists(music):
+        music = sfx.make_music_upbeat(os.path.join(work, "upbeat.wav"))
     with anim.Renderer(vertical) as R:
         for i, (sc, (wav, dur, words)) in enumerate(zip(script["scenes"], audio)):
             frames = math.ceil((dur + GAP) * FPS)
@@ -53,13 +60,18 @@ def build(script, out_dir, music, vertical, audio):
                 screen["type"] = "title"
             html = anim.build_html(screen, words, sp, i, n, vertical, clear=bool(clip), style=script.get("style"))
             slide = R.frames(html, frames, work, f"s{i}{tag}", transparent=bool(clip))
-            char = (character.build_bubble_frames(wav, frames / FPS, work, i, 420 if vertical else 340)
-                    if sc.get("presenter", True) else None)
+            if not sc.get("presenter", True):
+                char = None
+            elif stage:
+                char = character.build_scene_frames(wav, frames / FPS, work, i)
+            else:
+                char = character.build_bubble_frames(wav, frames / FPS, work, i, 420 if vertical else 340)
             scenes.append(dict(frames=frames, wav=wav, words=words, slide=slide, clip=clip, char=char,
                                events=sfx.events_from_html(html)))
             print(f"[{'short' if vertical else 'video'}] scene {i + 1}/{n} ready ({frames / FPS:.1f}s)")
     return render.render(scenes, work, os.path.join(out_dir, "short.mp4" if vertical else "final.mp4"),
-                         music, vertical, captions=script.get("captions", True))
+                         music, vertical, captions=script.get("captions", True),
+                         presenter="stage" if stage else "bubble", music_volume=script.get("music_volume", 0.16))
 
 
 def make_thumbnail(script, out_dir):

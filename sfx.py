@@ -108,3 +108,74 @@ def make_music(path):
                     "-af", "lowpass=f=1400,aecho=0.8:0.6:90|170:0.25|0.15,volume=0.8",
                     "-ac", "1", "-c:a", "pcm_s16le", path], check=True)
     return path
+
+
+def make_music_upbeat(path, bpm=108, bars=8, seed=3):
+    """bright, modern 'corporate / tech ad' loop: pluck chords, warm pad, bass, soft kick, clap and hats.
+    Progression C - G - Am - F (uplifting pop). Generated here, so no copyright issues. Seamless loop."""
+    if os.path.exists(path):
+        return path
+    import numpy as np
+    rng = np.random.default_rng(seed)
+    beat = 60.0 / bpm; bar = 4 * beat
+    n = int(SR * bar * bars); L = np.zeros(n); R = np.zeros(n)
+    hz = lambda m: 440.0 * 2 ** ((m - 69) / 12)
+    prog = [[60, 64, 67, 72], [59, 62, 67, 71], [57, 60, 64, 69], [57, 60, 65, 69]]  # C, G/B, Am, F
+    roots = [36, 43, 45, 41]
+
+    def add(sig, t0, pan=0.0, gain=1.0):
+        i = int(t0 * SR); j = min(n, i + len(sig))
+        if i >= n:
+            return
+        s = sig[: j - i] * gain
+        L[i:j] += s * (1 - pan) ** 0.5; R[i:j] += s * (1 + pan) ** 0.5
+
+    def tone(f, dur, decay, harm=(1, .5, .25, .12), attack=0.004):
+        t = np.arange(int(dur * SR)) / SR
+        w = sum(a * np.sin(2 * np.pi * f * (k + 1) * t) for k, a in enumerate(harm))
+        rel = np.minimum(1, (t[-1] - t) / 0.03 + 1e-9)  # 30 ms release, no clicks at note ends
+        return w * np.exp(-t * decay) * np.minimum(1, t / attack) * rel
+
+    def noise(dur, decay, hp=True):
+        x = rng.uniform(-1, 1, int(dur * SR))
+        if hp:
+            x = np.diff(x, prepend=0)
+        t = np.arange(len(x)) / SR
+        return x * np.exp(-t * decay)
+
+    kick_t = np.arange(int(0.35 * SR)) / SR
+    kick = np.sin(2 * np.pi * (48 * kick_t + 90 * (1 - np.exp(-kick_t * 30)) / 30)) * np.exp(-kick_t * 9)
+    for b in range(bars):
+        c = b % 4; t_bar = b * bar
+        # warm pad (whole bar)
+        for m in prog[c]:
+            add(tone(hz(m), bar, 0.6, harm=(1, .3, .1), attack=0.25), t_bar, pan=0.0, gain=0.035)
+        # pluck pattern on 8ths: x . x x . x . x
+        for k, on in enumerate([1, 0, 1, 1, 0, 1, 0, 1]):
+            if on:
+                for vi, m in enumerate(prog[c][1:] if k % 2 else prog[c][:3]):
+                    add(tone(hz(m + 12), 0.5, 9), t_bar + k * beat / 2, pan=(-0.35 + 0.35 * vi), gain=0.09)
+        # bass: root on 8ths with octave bounce
+        for k in range(8):
+            m = roots[c] + (12 if k % 4 == 3 else 0)
+            add(tone(hz(m), beat / 2 * 0.95, 5, harm=(1, .35, .1), attack=0.01), t_bar + k * beat / 2, gain=0.16)
+        # drums
+        for q in range(4):
+            add(kick, t_bar + q * beat, gain=0.4)
+            if q in (1, 3):
+                add(noise(0.12, 30), t_bar + q * beat, gain=0.06)
+            add(noise(0.04, 90), t_bar + q * beat + beat / 2, pan=0.3, gain=0.025)
+        if b % 4 == 3:  # little fill at phrase end
+            for k in range(4):
+                add(noise(0.04, 90), t_bar + 3 * beat + k * beat / 4, pan=-0.3, gain=0.02)
+    peak = max(np.abs(L).max(), np.abs(R).max()) or 1
+    st = (np.stack([L, R], 1) / peak * 0.85 * 32767).astype("<i2")
+    raw = path + ".raw.wav"
+    with wave.open(raw, "wb") as w:
+        w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes(st.tobytes())
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", raw, "-af",
+                    "lowpass=f=10000,aecho=0.8:0.5:60|120:0.18|0.1,equalizer=f=250:t=q:w=1:g=-2,highshelf=f=6000:g=1.5,"
+                    "acompressor=threshold=0.3:ratio=2:attack=10:release=150",
+                    "-c:a", "pcm_s16le", path], check=True)
+    os.remove(raw)
+    return path

@@ -74,6 +74,86 @@ def _base(eyes_open: bool, mouth: int, pose: int = 0) -> Image.Image:
     return im.resize((CW, CH), Image.LANCZOS)
 
 
+STYLE = "classic"  # "pro": young man in a navy blazer, shirt and tie (set by main.py from the script)
+
+
+def _base_pro(eyes_open: bool, mouth: int, pose: int = 0) -> Image.Image:
+    """professional young presenter: neat dark hair, clean-shaven, navy blazer, white shirt, green tie"""
+    im = Image.new("RGBA", (CW * S, CH * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    s = lambda *v: [(x + (OX if k % 2 == 0 else 0)) * S for k, x in enumerate(v)]
+    skin, skin_d, hair = (214, 162, 122), (190, 138, 100), (24, 20, 22)
+    navy, navy_l, shirt, tie = (20, 33, 56), (31, 48, 78), (244, 246, 248), (58, 110, 18)
+
+    def limb(pts, w, col):
+        for a, b in zip(pts, pts[1:]):
+            d.line(s(*a, *b), fill=col, width=w * S)
+        for q in pts[:-1]:
+            d.ellipse(s(q[0] - w // 2, q[1] - w // 2, q[0] + w // 2, q[1] + w // 2), fill=col)
+    # blazer body, shirt, tie, lapels
+    d.rounded_rectangle(s(50, 480, 510, 780), radius=110 * S, fill=navy)
+    d.polygon(s(200, 478, 360, 478, 280, 640), fill=shirt)
+    d.polygon(s(268, 500, 292, 500, 300, 520, 290, 620, 280, 640, 270, 620, 260, 520), fill=tie)
+    d.polygon(s(262, 486, 298, 486, 292, 506, 268, 506), fill=(46, 90, 12))          # knot
+    d.polygon(s(200, 478, 236, 470, 280, 640, 250, 600), fill=navy_l)                 # left lapel
+    d.polygon(s(360, 478, 324, 470, 280, 640, 310, 600), fill=navy_l)                 # right lapel
+    d.polygon(s(232, 470, 262, 486, 252, 500), fill=shirt)                            # collar
+    d.polygon(s(328, 470, 298, 486, 308, 500), fill=shirt)
+    d.rounded_rectangle(s(395, 560, 445, 574), radius=4 * S, fill=(191, 255, 118))   # pocket square
+    if pose == 1:   # pointing at the slide on the left
+        limb([(130, 590), (50, 530), (20, 450)], 66, navy)
+        d.rectangle(s(-4, 414, 44, 434), fill=shirt)                                   # cuff
+        d.ellipse(s(-20, 350, 56, 426), fill=skin)                                     # palm
+        for fy in (356, 374, 392, 410):                                                # fingers toward the slide
+            d.rounded_rectangle(s(-56, fy - 8, 0, fy + 8), radius=8 * S, fill=skin)
+        d.rounded_rectangle(s(24, 322, 42, 366), radius=9 * S, fill=skin)              # thumb
+    elif pose == 2:  # open hand explaining
+        limb([(430, 610), (530, 570), (560, 480)], 66, navy)
+        d.rectangle(s(536, 456, 584, 476), fill=shirt)
+        d.ellipse(s(520, 390, 600, 470), fill=skin)
+        for fx in (528, 548, 568, 588):
+            d.rounded_rectangle(s(fx - 8, 360, fx + 8, 420), radius=8 * S, fill=skin)
+    # neck, ears, head
+    d.rectangle(s(242, 400, 318, 486), fill=skin_d)
+    d.ellipse(s(92, 250, 146, 340), fill=skin_d)
+    d.ellipse(s(414, 250, 468, 340), fill=skin_d)
+    d.ellipse(s(110, 80, 450, 460), fill=skin)
+    # hair: neat, side part
+    d.pieslice(s(100, 50, 460, 330), 180, 360, fill=hair)
+    d.ellipse(s(100, 120, 170, 250), fill=hair)
+    d.ellipse(s(390, 120, 460, 250), fill=hair)
+    d.chord(s(150, 120, 420, 250), 0, 180, fill=skin)
+    d.polygon(s(150, 180, 210, 110, 330, 96, 420, 150, 420, 180, 330, 140, 220, 150), fill=hair)
+    d.line(s(205, 108, 236, 150), fill=(60, 50, 52), width=4 * S)                     # part line
+    # eyes
+    for cx in (210, 350):
+        if eyes_open:
+            d.ellipse(s(cx - 30, 262, cx + 30, 298), fill=(255, 255, 255))
+            d.ellipse(s(cx - 15, 264, cx + 15, 296), fill=(70, 44, 30))
+            d.ellipse(s(cx - 8, 271, cx + 8, 289), fill=(18, 14, 14))
+            d.ellipse(s(cx + 2, 268, cx + 9, 276), fill=(255, 255, 255))
+            d.arc(s(cx - 32, 258, cx + 32, 300), 200, 340, fill=(40, 30, 28), width=4 * S)
+        else:
+            d.arc(s(cx - 30, 262, cx + 30, 296), 20, 160, fill=(40, 30, 28), width=5 * S)
+    # brows
+    d.line(s(172, 238, 250, 232), fill=hair, width=12 * S)
+    d.line(s(310, 232, 388, 238), fill=hair, width=12 * S)
+    # nose
+    d.arc(s(262, 300, 298, 350), 30, 150, fill=skin_d, width=5 * S)
+    # mouth (0 closed smile, 1 small, 2 medium, 3 wide)
+    mx, my = 280, 398
+    if mouth == 0:
+        d.arc(s(mx - 34, my - 18, mx + 34, my + 10), 20, 160, fill=(130, 60, 60), width=6 * S)
+    else:
+        h = {1: 10, 2: 20, 3: 30}[mouth]
+        w = {1: 22, 2: 28, 3: 32}[mouth]
+        d.ellipse(s(mx - w, my - 6, mx + w, my + h), fill=(100, 34, 40))
+        d.rectangle(s(mx - w + 8, my - 6, mx + w - 8, my + 2), fill=(250, 250, 250))
+        if mouth >= 2:
+            d.ellipse(s(mx - w + 10, my + h - 12, mx + w - 10, my + h + 2), fill=(200, 100, 105))
+    return im.resize((CW, CH), Image.LANCZOS)
+
+
 _cache = {}
 
 
@@ -81,10 +161,11 @@ BOB = 8  # px of head/body bob while talking
 
 
 def frame(eyes_open, mouth, pose=0, bob=0):
-    k = (eyes_open, mouth, pose, bob)
+    k = (STYLE, eyes_open, mouth, pose, bob)
     if k not in _cache:
         im = Image.new("RGBA", (CW, CH), (0, 0, 0, 0))
-        im.alpha_composite(_base(eyes_open, mouth, pose), (0, BOB - bob))
+        base = _base_pro if STYLE == "pro" else _base
+        im.alpha_composite(base(eyes_open, mouth, pose), (0, BOB - bob))
         _cache[k] = im
     return _cache[k]
 
@@ -140,7 +221,7 @@ def build_scene_frames(audio_path, total_seconds, workdir, idx, seed=0, gesture_
         states.append((eyes, m, pose, bob))
     paths = {}
     for st in set(states):
-        p = os.path.join(workdir, "char_%d%d%d%d.png" % (int(st[0]), st[1], st[2], st[3]))
+        p = os.path.join(workdir, "char_%s_%d%d%d%d.png" % (STYLE, int(st[0]), st[1], st[2], st[3]))
         if not os.path.exists(p):
             frame(*st).save(p)
         paths[st] = os.path.abspath(p)
@@ -202,7 +283,7 @@ def build_bubble_frames(audio_path, total_seconds, workdir, idx, size=340, seed=
     with open(lst, "w") as f:
         run_st, run_n = states[0], 0
         def flush(st, c):
-            p = os.path.abspath(os.path.join(workdir, "bub%d_%d%d%d.png" % (size, int(st[0]), st[1], st[2])))
+            p = os.path.abspath(os.path.join(workdir, "bub%d_%s_%d%d%d.png" % (size, STYLE, int(st[0]), st[1], st[2])))
             if not os.path.exists(p):
                 bubble(st[0], st[1], st[2], size).save(p)
             f.write(f"file '{p}'\nduration {c / FPS:.5f}\n")

@@ -3,11 +3,28 @@
   "short_title": "Rabta app – بغیر انٹرنیٹ میسج",
   "thumbnail_file": "scripts/rabta_ad_thumbnail.png",
   "description": "رابطہ – آپ کی اپنی چیٹ ایپ۔\n\n- چیٹ: ریڈ ٹکس، ریپلائی اور ری ایکشنز\n- وائس اور ویڈیو کالز، اسکرین شیئرنگ کے ساتھ\n- انٹرنیٹ کے بغیر: بلوٹوتھ اور وائی فائی سے فون سے فون پیغام\n- رابطہ ڈراپ: 4 جی بی تک فائلیں بغیر انٹرنیٹ\n- لاک چیٹس، گوگل ڈرائیو بیک اپ، پہنچ گیا\n- 24 گھنٹے کا اسٹیٹس\n\nڈاؤن لوڈ: rabta.app/download\n\n#Rabta #UrduApp #ChatApp",
-  "tags": ["Rabta", "Rabta app", "Urdu chat app", "offline chat", "Pakistan app", "chat without internet", "video call app"],
+  "tags": [
+    "Rabta",
+    "Rabta app",
+    "Urdu chat app",
+    "offline chat",
+    "Pakistan app",
+    "chat without internet",
+    "video call app"
+  ],
   "voice": "ur-PK-AsadNeural",
   "voice_rate": "+0%",
   "captions": false,
-  "style": {"brand": "RABTA", "logo": "rabta_logo.png", "theme": "rabta", "lang": "ur"},
+  "music": "upbeat",
+  "music_volume": 0.22,
+  "style": {
+    "brand": "RABTA",
+    "logo": "rabta_logo.png",
+    "theme": "rabta",
+    "lang": "ur",
+    "character": "pro",
+    "presenter": "stage"
+  },
   "scenes": [
     {
       "narration": "انٹرنیٹ نہیں ہے؟ کوئی بات نہیں! پیش ہے رابطہ۔ آپ کی اپنی چیٹ ایپ، جو ہر حال میں آپ کو اپنوں سے جوڑے رکھتی ہے۔",
@@ -24,7 +41,12 @@
         "type": "checklist",
         "tag": "ہر سہولت",
         "title": "روزمرہ کی **ہر سہولت**",
-        "items": ["تیز چیٹ، ریڈ ٹکس، ری ایکشنز", "آواز اور ویڈیو کالز", "گروپس", "چوبیس گھنٹے کا اسٹیٹس"]
+        "items": [
+          "تیز چیٹ، ریڈ ٹکس، ری ایکشنز",
+          "آواز اور ویڈیو کالز",
+          "گروپس",
+          "چوبیس گھنٹے کا اسٹیٹس"
+        ]
       }
     },
     {
@@ -46,7 +68,11 @@
         "type": "steps",
         "tag": "رابطہ ڈراپ",
         "title": "**بغیر انٹرنیٹ** فائل بھیجیں",
-        "items": ["تصویریں اور ویڈیوز", "ڈاکومنٹس اور پی ڈی ایف", "چار جی بی تک"]
+        "items": [
+          "تصویریں اور ویڈیوز",
+          "ڈاکومنٹس اور پی ڈی ایف",
+          "چار جی بی تک"
+        ]
       }
     },
     {
@@ -55,7 +81,11 @@
         "type": "checklist",
         "tag": "حفاظت",
         "title": "آپ کی **پرائیویسی** پہلے",
-        "items": ["لاک چیٹس", "گوگل ڈرائیو بیک اپ", "پہنچ گیا: گھر والوں کو خبر"]
+        "items": [
+          "لاک چیٹس",
+          "گوگل ڈرائیو بیک اپ",
+          "پہنچ گیا: گھر والوں کو خبر"
+        ]
       }
     },
     {

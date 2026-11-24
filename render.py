@@ -64,13 +64,15 @@ Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
     open(path, "w").write(head + "\n".join(ev) + "\n")
 
 
-def render(scenes, workdir, out_path, music=None, vertical=False, captions=True):
+def render(scenes, workdir, out_path, music=None, vertical=False, captions=True, presenter="bubble", music_volume=0.16):
     """scenes: list of dict(frames=N, wav, words(scene-relative), slide(concat list), clip(optional stock mp4),
     char(optional concat list))"""
     W, H = (1080, 1920) if vertical else (1920, 1080)
     tag = "v" if vertical else "h"
     bub = 420 if vertical else 340
     cx, cy = ((W - bub) // 2, H - bub - 90) if vertical else (W - bub - 60, H - bub - 50)
+    if presenter == "stage":  # 680x700 half-body canvas standing on the bottom edge
+        cx, cy = ((W - 680) // 2, H - 700) if vertical else (W - 680 + 10, H - 700)
     cover = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS}"
     vsegs, asegs, all_words, t0, events = [], [], [], 0.0, []
     for i, s in enumerate(scenes):
@@ -121,7 +123,7 @@ def render(scenes, workdir, out_path, music=None, vertical=False, captions=True)
     fc = (f"[0:v]{subs}fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.45:.3f}:d=0.45[v];"
           f"[1:a]loudnorm=I=-15:TP=-2:LRA=9,aresample=48000,asplit=2[vo][vsc];"
           f"[2:a]aresample=48000,volume=0.55[sx];"
-          f"[3:a]aresample=48000,volume=0.16,afade=t=in:st=0:d=1.5[m0];"
+          f"[3:a]aresample=48000,volume={music_volume},afade=t=in:st=0:d=1.5[m0];"
           f"[m0][vsc]sidechaincompress=threshold=0.03:ratio=5:attack=20:release=500[m];"
           f"[vo][sx][m]amix=inputs=3:duration=first:normalize=0,alimiter=limit=0.95,"
           f"afade=t=out:st={total - 0.8:.3f}:d=0.8[a]")
