@@ -25,13 +25,14 @@ def _in_thread(fn):
     return out[0]
 
 
-def _edge(text, path, voice):
+def _edge(text, path, voice, rate=None):
+    rate = rate or EDGE_RATE
     async def go():
         import edge_tts
         try:
-            c = edge_tts.Communicate(text, voice, rate=EDGE_RATE, boundary="WordBoundary")
+            c = edge_tts.Communicate(text, voice, rate=rate, boundary="WordBoundary")
         except TypeError:  # older edge-tts always sends word boundaries
-            c = edge_tts.Communicate(text, voice, rate=EDGE_RATE)
+            c = edge_tts.Communicate(text, voice, rate=rate)
         words = []
         with open(path, "wb") as f:
             async for ch in c.stream():
@@ -69,8 +70,14 @@ def _eleven(text, path):
     return words
 
 
-def synth(text: str, path: str) -> list:
-    """writes audio to path, returns word timings [[start, end, word], ...] (may be empty)"""
+def synth(text: str, path: str, voice: str = None, rate: str = None) -> list:
+    """writes audio to path, returns word timings [[start, end, word], ...] (may be empty).
+    voice: Edge voice for this script (e.g. ur-PK-AsadNeural for Urdu); it skips ElevenLabs."""
+    if voice:
+        words = _edge(text, path, voice, rate)
+        if os.path.getsize(path) > 1000:
+            return words
+        raise RuntimeError(f"Voice {voice} returned no audio")
     if os.getenv("ELEVENLABS_API_KEY"):
         try:
             return _eleven(text, path)

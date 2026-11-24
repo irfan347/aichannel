@@ -16,6 +16,12 @@ Download from the run's **Artifacts -> video** (final.mp4, short.mp4, thumbnail.
 title, description, tags, thumbnail_text, short_title, scenes[]: narration + screen.
 screen types: `title` (title, subtitle), `chat` (user, ai), `steps`/`bullets`/`checklist` (title, items),
 `stock` (query, title). Add `"presenter": false` to a scene to hide the character.
+Chat screens can rename the bubbles and window: `user_name`, `ai_name`, `window`.
+
+## Urdu videos / ads (scripts/rabta_ad.json)
+Script-level options: `"voice": "ur-PK-AsadNeural"` (Urdu male; `ur-PK-UzmaNeural` is female), `"voice_rate"`,
+`"captions": false`, and `"style": {"brand": "RABTA", "logo": "rabta_logo.png", "theme": "rabta", "lang": "ur"}`.
+`lang: ur` renders slides right-to-left in Noto Nastaliq Urdu (bundled in brand/fonts, SIL OFL).
 
 ## YouTube upload refresh token
 Google Cloud -> enable YouTube Data API v3 -> OAuth client (Web) with redirect

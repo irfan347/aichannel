@@ -4,6 +4,8 @@
   python main.py --from-script scripts/video02.json --upload --privacy public
 
 Scene "screen" types: title, chat, steps, bullets, checklist, stock (stock footage, needs PEXELS_API_KEY).
+Script options: "voice" (Edge voice, e.g. ur-PK-AsadNeural), "voice_rate", "captions": false,
+"style": {"brand", "logo" (file in brand/), "theme" (e.g. rabta), "lang": "ur" for Urdu right-to-left}.
 Use **word** in titles/items to highlight a word in yellow.
 """
 import argparse, json, math, os, re
@@ -25,7 +27,7 @@ def prepare_audio(script, work):
         wav, wj = os.path.join(work, f"voice{i}.wav"), os.path.join(work, f"voice{i}.json")
         if not (os.path.exists(wav) and os.path.exists(wj)):
             raw = os.path.join(work, f"voice{i}_raw.mp3")
-            words = voice.synth(sc["narration"], raw)
+            words = voice.synth(sc["narration"], raw, script.get("voice"), script.get("voice_rate"))
             voice.clean(raw, wav)
             json.dump(voice.align(sc["narration"], words, voice.duration(wav)), open(wj, "w"))
         out.append((wav, voice.duration(wav), json.load(open(wj))))
@@ -49,7 +51,7 @@ def build(script, out_dir, music, vertical, audio):
                 if os.path.exists(c) or visuals.pexels_video(screen.get("query", "technology office"), c):
                     clip = c
                 screen["type"] = "title"
-            html = anim.build_html(screen, words, sp, i, n, vertical, clear=bool(clip))
+            html = anim.build_html(screen, words, sp, i, n, vertical, clear=bool(clip), style=script.get("style"))
             slide = R.frames(html, frames, work, f"s{i}{tag}", transparent=bool(clip))
             char = (character.build_bubble_frames(wav, frames / FPS, work, i, 420 if vertical else 340)
                     if sc.get("presenter", True) else None)
@@ -57,7 +59,7 @@ def build(script, out_dir, music, vertical, audio):
                                events=sfx.events_from_html(html)))
             print(f"[{'short' if vertical else 'video'}] scene {i + 1}/{n} ready ({frames / FPS:.1f}s)")
     return render.render(scenes, work, os.path.join(out_dir, "short.mp4" if vertical else "final.mp4"),
-                         music, vertical)
+                         music, vertical, captions=script.get("captions", True))
 
 
 def make_thumbnail(script, out_dir):

@@ -64,7 +64,7 @@ Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
     open(path, "w").write(head + "\n".join(ev) + "\n")
 
 
-def render(scenes, workdir, out_path, music=None, vertical=False):
+def render(scenes, workdir, out_path, music=None, vertical=False, captions=True):
     """scenes: list of dict(frames=N, wav, words(scene-relative), slide(concat list), clip(optional stock mp4),
     char(optional concat list))"""
     W, H = (1080, 1920) if vertical else (1920, 1080)
@@ -113,11 +113,12 @@ def render(scenes, workdir, out_path, music=None, vertical=False):
 
     ass = os.path.join(workdir, f"captions_{tag}.ass")
     make_ass(all_words, ass, W, H, vertical)
+    subs = f"ass={ass}," if captions else ""
     total = t0
     fx_wav = sfx.render_track(events, total, os.path.join(workdir, f"sfx_{tag}.wav"))
     if not (music and os.path.exists(music)):
         music = sfx.make_music(os.path.join(workdir, "pad.wav"))
-    fc = (f"[0:v]ass={ass},fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.45:.3f}:d=0.45[v];"
+    fc = (f"[0:v]{subs}fade=t=in:st=0:d=0.35,fade=t=out:st={total - 0.45:.3f}:d=0.45[v];"
           f"[1:a]loudnorm=I=-15:TP=-2:LRA=9,aresample=48000,asplit=2[vo][vsc];"
           f"[2:a]aresample=48000,volume=0.55[sx];"
           f"[3:a]aresample=48000,volume=0.16,afade=t=in:st=0:d=1.5[m0];"

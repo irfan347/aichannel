@@ -78,6 +78,44 @@ VERT = ("body{width:1080px;height:1920px}.area{left:70px;top:190px;width:940px;h
         ".prog{left:70px;top:112px}.brand{top:96px;right:60px}h1{font-size:96px}h2{font-size:66px}"
         ".item{font-size:46px}.u,.a{font-size:38px}")
 
+# Urdu: right-to-left Nastaliq text. Letter spacing and capitals break Urdu joining, so they are switched off,
+# and Nastaliq needs much taller lines.
+URDU = """body.ur{font-family:'UrduNastaliq','DejaVu Sans',sans-serif;direction:rtl}
+body.ur *{letter-spacing:0!important;text-transform:none!important}
+body.ur .brand,body.ur .prog{direction:ltr;font-family:'Inter','DejaVu Sans',sans-serif}
+body.ur h1{font-size:92px;line-height:1.9;font-weight:700}
+body.ur h2{font-size:58px;line-height:1.8;margin-bottom:18px;font-weight:700}
+body.ur .sub{font-size:44px;line-height:2}
+body.ur .tag{font-size:30px;padding:2px 26px 14px;line-height:1.9;margin-bottom:14px}
+body.ur .list{gap:14px}
+body.ur .item{font-size:40px;line-height:2;padding:4px 26px}
+body.ur .u,body.ur .a{font-size:34px;line-height:2.1;padding:10px 28px 18px}
+body.ur .who{font-size:24px}
+body.ur .win .bar{font-size:26px}
+body.ur .caret{margin:0 3px 0 0}
+"""
+# brand themes: accent colours swapped in over the default indigo/yellow look
+THEMES = {"rabta": """body{background:#080d14}
+.bg{background:radial-gradient(1200px 700px at 88% -10%,rgba(191,255,118,.20),transparent 60%),
+ radial-gradient(900px 600px at -10% 112%,rgba(84,221,197,.16),transparent 60%),
+ radial-gradient(rgba(255,255,255,.05) 1.6px,transparent 1.6px) 0 0/38px 38px}
+.hl{color:#bfff76}.tag{background:#bfff76;color:#080d14}.prog i.on{background:#bfff76}
+.sub{color:#54ddc5}.ic{background:#172230;color:#bfff76;border:2px solid rgba(191,255,118,.5)}
+.ic.ok{background:#bfff76;color:#080d14}.item.act{background:rgba(191,255,118,.10);border-color:rgba(191,255,118,.65)}
+.win{background:#111b27}.win .bar{background:#172230}.u{background:#3a6e12}.a{background:#172230}
+.brand{color:#f3f6f5}"""}
+_FONT = None
+
+
+def _font_css():
+    global _FONT
+    if _FONT is None:
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "brand", "fonts", "NotoNastaliqUrdu.ttf")
+        _FONT = (f"@font-face{{font-family:'UrduNastaliq';src:url(data:font/ttf;base64,"
+                 f"{base64.b64encode(open(p, 'rb').read()).decode()})}}") if os.path.exists(p) else ""
+    return _FONT
+
+
 JS = """
 function ease(p){return 1-Math.pow(1-p,3)}
 function clamp(x){return Math.max(0,Math.min(1,x))}
@@ -108,15 +146,14 @@ function render(t){
 }
 """
 
-_LOGO = None
+_LOGOS = {}
 
 
-def _logo():
-    global _LOGO
-    if _LOGO is None:
-        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "brand", "logo.png")
-        _LOGO = base64.b64encode(open(p, "rb").read()).decode() if os.path.exists(p) else ""
-    return _LOGO
+def _logo(name="logo.png"):
+    if name not in _LOGOS:
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "brand", name)
+        _LOGOS[name] = base64.b64encode(open(p, "rb").read()).decode() if os.path.exists(p) else ""
+    return _LOGOS[name]
 
 
 def _e(t):
@@ -129,7 +166,7 @@ def _plain(t):
 
 
 def _norm(w):
-    return re.sub(r"[^a-z0-9]", "", w.lower())
+    return re.sub(r"[\W_]", "", w.lower())  # unicode-aware, so Urdu words match too
 
 
 def _kw_time(words, text, after):
@@ -161,21 +198,23 @@ def _typing(cls, who, text, t0, t1, appear, caret=True, dots_until=None):
             f"<span class=ghost>{_plain(text)}</span><span class=txt><span class=tt></span>{c}</span>{dots}</div></div>")
 
 
-def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
-    """sc: screen spec; words: [[s,e,w]] scene-relative; sp: time speech ends"""
+def build_html(sc, words, sp, idx, n, vertical=False, clear=False, style=None):
+    """sc: screen spec; words: [[s,e,w]] scene-relative; sp: time speech ends.
+    style (from the script): brand, logo (file in brand/), theme, lang ("ur" = Urdu right-to-left)"""
+    style = style or {}
     t = sc.get("type", "title")
     tag = f"<div class=tag data-t=0.05 data-a=left>{_e(sc['tag'])}</div>" if sc.get("tag") else ""
     if t == "chat":
         head = f"<h2 data-t=0.1>{_e(sc['title'])}</h2>" if sc.get("title") else ""
         u, a = sc["user"], sc.get("ai", "")
         u0 = 0.45; u1 = u0 + min(len(u) / 38, max(sp * 0.45, 1.2))
-        body = _typing("u", "YOU", u, u0, u1, 0.3)
+        body = _typing("u", _e(sc.get("user_name", "YOU")), u, u0, u1, 0.3)
         if a:
             a0 = u1 + 0.9; a1 = a0 + min(len(a) / 70, max(sp - a0 - 0.2, 1.0))
-            body += _typing("a", "AI", a, a0, a1, u1 + 0.2, caret=False, dots_until=a0)
+            body += _typing("a", _e(sc.get("ai_name", "AI")), a, a0, a1, u1 + 0.2, caret=False, dots_until=a0)
         inner = (f"{tag}{head}<div class=win data-t=0.15 data-a=pop><div class=bar>"
                  "<span class=dot style='background:#ef4444'></span><span class=dot style='background:#f59e0b'></span>"
-                 f"<span class=dot style='background:#22c55e'></span>&nbsp; AI Assistant</div><div class=chat>{body}</div></div>")
+                 f"<span class=dot style='background:#22c55e'></span>&nbsp; {_e(sc.get('window', 'AI Assistant'))}</div><div class=chat>{body}</div></div>")
     elif t in ("bullets", "steps", "checklist"):
         items = sc["items"]; ts = _list_times(words, items, sp)
         rows = ""
@@ -229,10 +268,15 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False):
             sub = f"<div class=sub data-t={min(st, max(sp - 0.5, 0.8)):.2f}>{_e(sc['subtitle'])}</div>"
         inner = f"{tag}<h1 data-t=0.12>{_e(sc.get('title', ''))}</h1>{sub}"
     prog = "".join(f"<i class={'on' if k <= idx else ''}></i>" for k in range(n))
-    logo = f"<img src='data:image/png;base64,{_logo()}'>" if _logo() else ""
-    return (f"<html><head><style>{CSS}{VERT if vertical else LAND}</style><script>{JS}</script></head>"
-            f"<body class='{'clear' if clear else ''}'><div class=bg></div><div class=prog>{prog}</div>"
-            f"<div class=brand>{logo}WORK HACKED</div><div class=area>{inner}</div></body></html>")
+    lg = _logo(style.get("logo", "logo.png"))
+    logo = f"<img src='data:image/png;base64,{lg}'>" if lg else ""
+    ur = style.get("lang") == "ur"
+    css = (CSS + (VERT if vertical else LAND) + THEMES.get(style.get("theme"), "")
+           + (_font_css() + URDU if ur else ""))
+    cls = " ".join(c for c in ("clear" if clear else "", "ur" if ur else "") if c)
+    return (f"<html><head><style>{css}</style><script>{JS}</script></head>"
+            f"<body class='{cls}'><div class=bg></div><div class=prog>{prog}</div>"
+            f"<div class=brand>{logo}{_e(style.get('brand', 'WORK HACKED'))}</div><div class=area>{inner}</div></body></html>")
 
 
 class Renderer:
@@ -241,7 +285,7 @@ class Renderer:
 
     def __enter__(self):
         self._p = sync_playwright().start()
-        self._b = self._p.chromium.launch()
+        self._b = self._p.chromium.launch(executable_path=os.getenv("CHROMIUM_PATH") or None)
         size = {"width": 1080, "height": 1920} if self.vertical else {"width": 1920, "height": 1080}
         self.page = self._b.new_page(viewport=size)
         return self
