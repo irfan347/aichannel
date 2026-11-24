@@ -103,7 +103,12 @@ THEMES = {"rabta": """body{background:#080d14}
 .sub{color:#54ddc5}.ic{background:#172230;color:#bfff76;border:2px solid rgba(191,255,118,.5)}
 .ic.ok{background:#bfff76;color:#080d14}.item.act{background:rgba(191,255,118,.10);border-color:rgba(191,255,118,.65)}
 .win{background:#111b27}.win .bar{background:#172230}.u{background:#3a6e12}.a{background:#172230}
-.brand{color:#f3f6f5}"""}
+.brand{color:#f3f6f5}
+body.clear{background:transparent}
+body.clear .bg{background:linear-gradient(180deg,rgba(8,13,20,.55) 0%,rgba(8,13,20,.35) 45%,rgba(8,13,20,.85) 100%)}
+body.clear .item{background:rgba(8,13,20,.72)}body.clear .item.act{background:rgba(23,34,48,.88)}
+body.vert.clear .area{top:760px;height:1060px}
+body.clear h1,body.clear h2,body.clear .sub{text-shadow:0 4px 18px rgba(0,0,0,.85)}"""}
 _FONT = None
 
 
@@ -273,7 +278,7 @@ def build_html(sc, words, sp, idx, n, vertical=False, clear=False, style=None):
     ur = style.get("lang") == "ur"
     css = (CSS + (VERT if vertical else LAND) + THEMES.get(style.get("theme"), "")
            + (_font_css() + URDU if ur else ""))
-    cls = " ".join(c for c in ("clear" if clear else "", "ur" if ur else "") if c)
+    cls = " ".join(c for c in ("clear" if clear else "", "ur" if ur else "", "vert" if vertical else "") if c)
     return (f"<html><head><style>{css}</style><script>{JS}</script></head>"
             f"<body class='{cls}'><div class=bg></div><div class=prog>{prog}</div>"
             f"<div class=brand>{logo}{_e(style.get('brand', 'WORK HACKED'))}</div><div class=area>{inner}</div></body></html>")

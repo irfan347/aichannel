@@ -32,7 +32,8 @@
         "type": "title",
         "tag": "نئی ایپ",
         "title": "**رابطہ**",
-        "subtitle": "ہر حال میں اپنوں کے قریب"
+        "subtitle": "ہر حال میں اپنوں کے قریب",
+        "bg": "young man smiling at smartphone"
       }
     },
     {
@@ -46,7 +47,8 @@
           "آواز اور ویڈیو کالز",
           "گروپس",
           "چوبیس گھنٹے کا اسٹیٹس"
-        ]
+        ],
+        "bg": "young man texting on phone"
       }
     },
     {
@@ -59,7 +61,8 @@
         "user_name": "علی",
         "ai_name": "امی",
         "user": "امی، نیٹ بند ہے لیکن میں خیریت سے ہوں",
-        "ai": "شکر الحمدللہ بیٹا! جلدی گھر آ جاؤ"
+        "ai": "شکر الحمدللہ بیٹا! جلدی گھر آ جاؤ",
+        "bg": "man video call smartphone"
       }
     },
     {
@@ -72,7 +75,8 @@
           "تصویریں اور ویڈیوز",
           "ڈاکومنٹس اور پی ڈی ایف",
           "چار جی بی تک"
-        ]
+        ],
+        "bg": "friends sharing photos on phone"
       }
     },
     {
@@ -85,7 +89,8 @@
           "لاک چیٹس",
           "گوگل ڈرائیو بیک اپ",
           "پہنچ گیا: گھر والوں کو خبر"
-        ]
+        ],
+        "bg": "man using phone at night"
       }
     },
     {
@@ -94,7 +99,8 @@
         "type": "title",
         "tag": "ابھی ڈاؤن لوڈ کریں",
         "title": "**رابطہ** ڈاؤن لوڈ کریں",
-        "subtitle": "rabta.app/download"
+        "subtitle": "rabta.app/download",
+        "bg": "happy young man holding phone"
       }
     }
   ]

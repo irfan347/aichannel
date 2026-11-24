@@ -7,6 +7,7 @@ Scene "screen" types: title, chat, steps, bullets, checklist, stock (stock foota
 Script options: "voice" (Edge voice, e.g. ur-PK-AsadNeural), "voice_rate", "captions": false,
 "style": {"brand", "logo" (file in brand/), "theme" (e.g. rabta), "lang": "ur" for Urdu right-to-left,
 "character": "pro" (presenter in blazer and tie), "presenter": "stage" (big presenter beside the slides)},
+Any screen can take "bg": "<Pexels search>" for full-screen real footage behind it (hides the cartoon).
 "music": "upbeat" (generated ad-style track when no music.mp3), "music_volume" (default 0.16).
 Use **word** in titles/items to highlight a word in yellow.
 """
@@ -58,10 +59,14 @@ def build(script, out_dir, music, vertical, audio):
                 if os.path.exists(c) or visuals.pexels_video(screen.get("query", "technology office"), c):
                     clip = c
                 screen["type"] = "title"
+            elif screen.get("bg"):  # real stock footage (Pexels) full-screen behind any slide type
+                c = os.path.join(work, f"bg{i}{tag}.mp4")
+                if os.path.exists(c) or visuals.pexels_video(screen["bg"], c, portrait=vertical):
+                    clip = c
             html = anim.build_html(screen, words, sp, i, n, vertical, clear=bool(clip), style=script.get("style"))
             slide = R.frames(html, frames, work, f"s{i}{tag}", transparent=bool(clip))
-            if not sc.get("presenter", True):
-                char = None
+            if not sc.get("presenter", True) or (clip and screen.get("bg")):
+                char = None  # the stock footage person is the presenter
             elif stage:
                 char = character.build_scene_frames(wav, frames / FPS, work, i)
             else:

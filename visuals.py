@@ -7,20 +7,22 @@ PALETTES = [((20, 30, 70), (90, 40, 140)), ((10, 60, 80), (20, 20, 60)),
             ((60, 20, 60), (20, 40, 90)), ((15, 15, 35), (40, 90, 120))]
 
 
-def pexels_video(query: str, out: str) -> bool:
+def pexels_video(query: str, out: str, portrait: bool = False) -> bool:
     key = os.getenv("PEXELS_API_KEY")
     if not key:
         return False
     try:
         r = requests.get("https://api.pexels.com/videos/search",
                          headers={"Authorization": key},
-                         params={"query": query, "per_page": 8, "orientation": "landscape"}, timeout=20)
+                         params={"query": query, "per_page": 8, "orientation": "portrait" if portrait else "landscape"},
+                         timeout=20)
         vids = r.json().get("videos", [])
         if not vids:
             return False
-        v = random.choice(vids)
+        v = random.Random(query).choice(vids[:5])  # same clip for the same search on every run
+        target = 1080 if portrait else 1920
         files = sorted([f for f in v["video_files"] if f["file_type"] == "video/mp4"],
-                       key=lambda f: abs((f.get("width") or 0) - 1920))
+                       key=lambda f: abs((f.get("width") or 0) - target))
         data = requests.get(files[0]["link"], timeout=60).content
         open(out, "wb").write(data)
         return True
